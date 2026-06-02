@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, BookOpen, Calendar, Eye, Download, FileText, X } from 'lucide-react';
 import { NoteService } from '../db';
-import { FirebaseNoteService } from '../firebase/firebaseService';
 
 const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-export default function SearchView({ userId, useFirebase }) {
+export default function SearchView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     grade: 'all',
@@ -28,12 +27,7 @@ export default function SearchView({ userId, useFirebase }) {
       keywords: searchQuery
     };
     
-    let result;
-    if (useFirebase && userId) {
-      result = await FirebaseNoteService.searchNotes(userId, searchFilters);
-    } else {
-      result = await NoteService.searchNotes(searchFilters);
-    }
+    const result = await NoteService.searchNotes(searchFilters);
     
     if (result.success) {
       setSearchResults(result.notes);

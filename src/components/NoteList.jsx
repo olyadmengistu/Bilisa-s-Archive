@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Trash2, Eye, Download, FileText, Calendar, BookOpen, ChevronDown } from 'lucide-react';
 import { NoteService } from '../db';
-import { FirebaseNoteService } from '../firebase/firebaseService';
 import FullScreenNoteViewer from './FullScreenNoteViewer';
 import MathRenderer from './MathRenderer';
 
@@ -47,7 +46,7 @@ const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-export default function NoteList({ notes, onNoteDeleted, loading, userId, useFirebase }) {
+export default function NoteList({ notes, onNoteDeleted, loading }) {
   const [filteredNotes, setFilteredNotes] = useState(notes);
   const [filters, setFilters] = useState({
     grade: 'all',
@@ -109,16 +108,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId, useFir
     }
 
     setDeletingId(id);
-<<<<<<< HEAD
-    let result;
-    if (useFirebase && userId) {
-      result = await FirebaseNoteService.deleteNote(id);
-    } else {
-      result = await NoteService.deleteNote(id);
-    }
-=======
     const result = await NoteService.deleteNote(id);
->>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
     
     if (result.success) {
       onNoteDeleted();
