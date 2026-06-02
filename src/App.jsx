@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award, LogOut, User } from 'lucide-react';
+=======
+import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award } from 'lucide-react';
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
 import { NoteService } from './db';
+<<<<<<< HEAD
 import { AuthService } from './firebase/authService';
 import { FirebaseNoteService } from './firebase/firebaseService';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import MigrationPrompt from './components/Auth/MigrationPrompt';
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -16,16 +23,20 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalNotes: 0, gradeStats: {} });
+<<<<<<< HEAD
   const [user, setUser] = useState(null);
   const [authView, setAuthView] = useState('login'); // 'login' or 'register'
   const [showMigration, setShowMigration] = useState(false);
   const [useFirebase, setUseFirebase] = useState(false);
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 
   useEffect(() => {
     // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
     
+<<<<<<< HEAD
     // Listen to auth state changes
     const unsubscribe = AuthService.onAuthStateChange((user) => {
       setUser(user);
@@ -39,6 +50,11 @@ function App() {
     loadStats();
 
     return () => unsubscribe();
+=======
+    // Load initial notes
+    loadNotes();
+    loadStats();
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
   }, []);
 
   useEffect(() => {
@@ -60,6 +76,7 @@ function App() {
     setLoading(false);
   };
 
+<<<<<<< HEAD
   const loadFirebaseNotes = async (userId) => {
     setLoading(true);
     const result = await FirebaseNoteService.getAllNotes(userId);
@@ -76,6 +93,8 @@ function App() {
     }
   };
 
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
   const loadStats = async () => {
     const result = await NoteService.getStats();
     if (result.success) {
@@ -88,6 +107,7 @@ function App() {
   };
 
   const handleNoteAdded = () => {
+<<<<<<< HEAD
     if (useFirebase && user) {
       loadFirebaseNotes(user.uid);
       loadFirebaseStats(user.uid);
@@ -95,10 +115,15 @@ function App() {
       loadNotes();
       loadStats();
     }
+=======
+    loadNotes();
+    loadStats();
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
     setCurrentView('notes');
   };
 
   const handleNoteDeleted = () => {
+<<<<<<< HEAD
     if (useFirebase && user) {
       loadFirebaseNotes(user.uid);
       loadFirebaseStats(user.uid);
@@ -113,10 +138,13 @@ function App() {
     setUser(null);
     setUseFirebase(false);
     setShowMigration(false);
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
     loadNotes();
     loadStats();
   };
 
+<<<<<<< HEAD
   const handleMigrationComplete = (result) => {
     setShowMigration(false);
     setUseFirebase(true);
@@ -135,6 +163,8 @@ function App() {
     }
   };
 
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
   const renderContent = () => {
     switch (currentView) {
       case 'home':
@@ -230,6 +260,7 @@ function App() {
         );
 
       case 'add':
+<<<<<<< HEAD
         return <NoteForm onNoteAdded={handleNoteAdded} userId={user?.uid} useFirebase={useFirebase} />;
 
       case 'notes':
@@ -237,12 +268,22 @@ function App() {
 
       case 'search':
         return <SearchView userId={user?.uid} useFirebase={useFirebase} />;
+=======
+        return <NoteForm onNoteAdded={handleNoteAdded} />;
+
+      case 'notes':
+        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} />;
+
+      case 'search':
+        return <SearchView />;
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 
       default:
         return null;
     }
   };
 
+<<<<<<< HEAD
   // Show authentication screens if not logged in
   if (!user) {
     if (authView === 'login') {
@@ -273,6 +314,8 @@ function App() {
     );
   }
 
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Header */}
@@ -286,11 +329,14 @@ function App() {
                 </div>
                 <h1 className="text-xl font-bold logo-bilisa">Bilisa Archive</h1>
                 <Sparkles className="w-4 h-4 text-yellow-500 animate-pulse" />
+<<<<<<< HEAD
                 {useFirebase && (
                   <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full font-medium">
                     Cloud Synced
                   </span>
                 )}
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
               </div>
               <nav className="hidden md:flex gap-2">
                 <button
@@ -340,6 +386,7 @@ function App() {
               </nav>
             </div>
             
+<<<<<<< HEAD
             <div className="flex items-center gap-3">
               {user && (
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
@@ -369,6 +416,19 @@ function App() {
                 )}
               </button>
             </div>
+=======
+            <button
+              onClick={toggleDarkMode}
+              className="feature-icon hover-lift animate-pulse-slow"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
           </div>
         </div>
       </header>

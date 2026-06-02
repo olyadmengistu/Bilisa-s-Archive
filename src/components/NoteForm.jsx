@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { Save, Upload, FileText, X, AlertCircle, Eye } from 'lucide-react';
 import { NoteService } from '../db';
+<<<<<<< HEAD
 import { FirebaseNoteService } from '../firebase/firebaseService';
+=======
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 
 const GRADES = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`);
 
+<<<<<<< HEAD
 export default function NoteForm({ onNoteAdded, userId, useFirebase }) {
+=======
+export default function NoteForm({ onNoteAdded }) {
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
   const [formData, setFormData] = useState({
     title: '',
     grade: '',
@@ -118,12 +125,16 @@ export default function NoteForm({ onNoteAdded, userId, useFirebase }) {
         pdfName: formData.pdfFile ? formData.pdfFile.name : null
       };
 
+<<<<<<< HEAD
       let result;
       if (useFirebase && userId) {
         result = await FirebaseNoteService.addNote(noteData, userId);
       } else {
         result = await NoteService.addNote(noteData);
       }
+=======
+      const result = await NoteService.addNote(noteData);
+>>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 
       if (result.success) {
         setSuccess('Note saved successfully!');
