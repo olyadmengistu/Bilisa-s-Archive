@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Trash2, Eye, Download, FileText, Calendar, BookOpen, ChevronDown } from 'lucide-react';
 import { NoteService } from '../db';
-<<<<<<< HEAD
 import { FirebaseNoteService } from '../firebase/firebaseService';
-=======
->>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
 import FullScreenNoteViewer from './FullScreenNoteViewer';
 import MathRenderer from './MathRenderer';
 
@@ -50,11 +47,7 @@ const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-<<<<<<< HEAD
 export default function NoteList({ notes, onNoteDeleted, loading, userId, useFirebase }) {
-=======
-export default function NoteList({ notes, onNoteDeleted, loading }) {
->>>>>>> e6f8ca8929c037e59356f3aad74f0bd53d9c399f
   const [filteredNotes, setFilteredNotes] = useState(notes);
   const [filters, setFilters] = useState({
     grade: 'all',
