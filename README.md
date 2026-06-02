@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Bilisa Archive - Offline Note-Taking Application
 
 A fully offline, local-first note-taking application designed for students to organize their study materials by grade, subject, and unit.
@@ -181,3 +182,7 @@ This project is created for educational purposes and personal use.
 ---
 
 **Bilisa Archive - Your personal academic companion for offline studying.**
+=======
+# Bilisa-s-Archive
+"This is Bilisa, on June 2, 2026. This private study tool is my personal space for storing notes and preparing for my Grade 12 entrance exam. It is designed solely for me, ensuring my learning journey stays organized, private, and accessible for years to come. I can do all things through Christ who strengthens me. June 2, 2026."
+>>>>>>> df0d6047c3bbd13f50a3fe84f59102b9694ebde4
