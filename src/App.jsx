@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award } from 'lucide-react';
+import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award, LogOut, User } from 'lucide-react';
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
 import { NoteService } from './db';
+import { AuthService } from './firebase/authService';
+import { FirebaseNoteService } from './firebase/firebaseService';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import MigrationPrompt from './components/Auth/MigrationPrompt';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -11,15 +16,29 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalNotes: 0, gradeStats: {} });
+  const [user, setUser] = useState(null);
+  const [authView, setAuthView] = useState('login'); // 'login' or 'register'
+  const [showMigration, setShowMigration] = useState(false);
+  const [useFirebase, setUseFirebase] = useState(false);
 
   useEffect(() => {
     // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
     
-    // Load initial notes
+    // Listen to auth state changes
+    const unsubscribe = AuthService.onAuthStateChange((user) => {
+      setUser(user);
+      if (user) {
+        setShowMigration(true);
+      }
+    });
+
+    // Load initial notes (local storage)
     loadNotes();
     loadStats();
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -41,6 +60,22 @@ function App() {
     setLoading(false);
   };
 
+  const loadFirebaseNotes = async (userId) => {
+    setLoading(true);
+    const result = await FirebaseNoteService.getAllNotes(userId);
+    if (result.success) {
+      setNotes(result.notes);
+    }
+    setLoading(false);
+  };
+
+  const loadFirebaseStats = async (userId) => {
+    const result = await FirebaseNoteService.getStats(userId);
+    if (result.success) {
+      setStats(result.stats);
+    }
+  };
+
   const loadStats = async () => {
     const result = await NoteService.getStats();
     if (result.success) {
@@ -53,14 +88,51 @@ function App() {
   };
 
   const handleNoteAdded = () => {
-    loadNotes();
-    loadStats();
+    if (useFirebase && user) {
+      loadFirebaseNotes(user.uid);
+      loadFirebaseStats(user.uid);
+    } else {
+      loadNotes();
+      loadStats();
+    }
     setCurrentView('notes');
   };
 
   const handleNoteDeleted = () => {
+    if (useFirebase && user) {
+      loadFirebaseNotes(user.uid);
+      loadFirebaseStats(user.uid);
+    } else {
+      loadNotes();
+      loadStats();
+    }
+  };
+
+  const handleLogout = async () => {
+    await AuthService.logout();
+    setUser(null);
+    setUseFirebase(false);
+    setShowMigration(false);
     loadNotes();
     loadStats();
+  };
+
+  const handleMigrationComplete = (result) => {
+    setShowMigration(false);
+    setUseFirebase(true);
+    if (user) {
+      loadFirebaseNotes(user.uid);
+      loadFirebaseStats(user.uid);
+    }
+  };
+
+  const handleSkipMigration = () => {
+    setShowMigration(false);
+    setUseFirebase(true);
+    if (user) {
+      loadFirebaseNotes(user.uid);
+      loadFirebaseStats(user.uid);
+    }
   };
 
   const renderContent = () => {
@@ -158,18 +230,48 @@ function App() {
         );
 
       case 'add':
-        return <NoteForm onNoteAdded={handleNoteAdded} />;
+        return <NoteForm onNoteAdded={handleNoteAdded} userId={user?.uid} useFirebase={useFirebase} />;
 
       case 'notes':
-        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} />;
+        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} userId={user?.uid} useFirebase={useFirebase} />;
 
       case 'search':
-        return <SearchView />;
+        return <SearchView userId={user?.uid} useFirebase={useFirebase} />;
 
       default:
         return null;
     }
   };
+
+  // Show authentication screens if not logged in
+  if (!user) {
+    if (authView === 'login') {
+      return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Login onLogin={() => setUser(AuthService.getCurrentUser())} onSwitchToRegister={() => setAuthView('register')} />
+        </div>
+      );
+    } else {
+      return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Register onRegister={() => setUser(AuthService.getCurrentUser())} onSwitchToLogin={() => setAuthView('login')} />
+        </div>
+      );
+    }
+  }
+
+  // Show migration prompt if logged in and migration not completed
+  if (showMigration) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <MigrationPrompt 
+          userId={user.uid} 
+          onComplete={handleMigrationComplete} 
+          onSkip={handleSkipMigration} 
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
@@ -184,6 +286,11 @@ function App() {
                 </div>
                 <h1 className="text-xl font-bold logo-bilisa">Bilisa Archive</h1>
                 <Sparkles className="w-4 h-4 text-yellow-500 animate-pulse" />
+                {useFirebase && (
+                  <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full font-medium">
+                    Cloud Synced
+                  </span>
+                )}
               </div>
               <nav className="hidden md:flex gap-2">
                 <button
@@ -233,17 +340,35 @@ function App() {
               </nav>
             </div>
             
-            <button
-              onClick={toggleDarkMode}
-              className="feature-icon hover-lift animate-pulse-slow"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
+            <div className="flex items-center gap-3">
+              {user && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                  <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </span>
+                </div>
               )}
-            </button>
+              <button
+                onClick={handleLogout}
+                className="feature-icon hover-lift text-red-600 dark:text-red-400"
+                aria-label="Logout"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+              <button
+                onClick={toggleDarkMode}
+                className="feature-icon hover-lift animate-pulse-slow"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </header>
