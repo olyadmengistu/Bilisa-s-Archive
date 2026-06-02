@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilisa Archive - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+    <style>
+        .dark {
+            color-scheme: dark;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div id="app">
+        <!-- Loading -->
+        <div class="min-h-screen flex items-center justify-center">
+            <div class="text-center">
+                <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p class="text-gray-600 dark:text-gray-400">Loading Bilisa Archive...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize IndexedDB
+        const db = new Dexie('BilisaArchive');
+        db.version(1).stores({
+            notes: '++id, grade, subject, unit, content, pdfData, timestamp, title, keywords'
+        });
+
+        // Note Service
+        class NoteService {
+            static async addNote(noteData) {
+                try {
+                    const existingNotes = await db.notes
+                        .where({ 
+                            grade: noteData.grade, 
+                            subject: noteData.subject, 
+                            unit: noteData.unit,
+                            title: noteData.title 
+                        })
+                        .toArray();
+
+                    if (existingNotes.length > 0) {
+                        throw new Error('A note with this title already exists for this grade, subject, and unit.');
+                    }
+
+                    const note = {
+                        ...noteData,
+                        timestamp: new Date().toISOString(),
+                        keywords: this.extractKeywords(noteData.content || '')
+                    };
+
+                    const id = await db.notes.add(note);
+                    return { success: true, id };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+
+            static async getAllNotes() {
+                try {
+                    const notes = await db.notes.orderBy('timestamp').reverse().toArray();
+                    return { success: true, notes };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+
+            static async searchNotes(filters = {}) {
+                try {
+                    let query = db.notes.toCollection();
+
+                    if (filters.grade && filters.grade !== 'all') {
+                        query = query.filter(note => note.grade === filters.grade);
+                    }
+
+                    if (filters.subject && filters.subject !== 'all') {
+                        query = query.filter(note => note.subject === filters.subject);
+                    }
+
+                    if (filters.unit && filters.unit !== 'all') {
+                        query = query.filter(note => note.unit === filters.unit);
+                    }
+
+                    if (filters.keywords && filters.keywords.trim()) {
+                        const searchTerm = filters.keywords.toLowerCase();
+                        query = query.filter(note => 
+                            note.content?.toLowerCase().includes(searchTerm) ||
+                            note.title?.toLowerCase().includes(searchTerm) ||
+                            note.keywords?.some(keyword => keyword.toLowerCase().includes(searchTerm))
+                        );
+                    }
+
+                    const notes = await query.toArray();
+                    return { success: true, notes };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+
+            static async deleteNote(id) {
+                try {
+                    await db.notes.delete(parseInt(id));
+                    return { success: true };
+                } catch (error) {
+                    return { success: false, error: error.message };
+                }
+            }
+
+            static extractKeywords(content) {
+                if (!content) return [];
+                
+                const words = content
+                    .toLowerCase()
+                    .replace(/[^\w\s]/g, ' ')
+                    .split(/\s+/)
+                    .filter(word => word.length > 3)
+                    .filter(word => !['this', 'that', 'with', 'from', 'they', 'have', 'been', 'said', 'each', 'which', 'their', 'time', 'will', 'about', 'would', 'there', 'could'].includes(word));
+                
+                return [...new Set(words)].slice(0, 20);
+            }
+        }
+
+        // Simple React-like App
+        class BilisaArchive {
+            constructor() {
+                this.currentView = 'home';
+                this.notes = [];
+                this.darkMode = false;
+                this.loading = true;
+                this.init();
+            }
+
+            async init() {
+                await this.loadNotes();
+                this.setupEventListeners();
+                this.checkDarkMode();
+                this.render();
+            }
+
+            async loadNotes() {
+                const result = await NoteService.getAllNotes();
+                if (result.success) {
+                    this.notes = result.notes;
+                }
+                this.loading = false;
+            }
+
+            setupEventListeners() {
+                window.addEventListener('popstate', () => {
+                    this.handleNavigation();
+                });
+            }
+
+            checkDarkMode() {
+                this.darkMode = localStorage.getItem('darkMode') === 'true';
+                this.updateDarkMode();
+            }
+
+            toggleDarkMode() {
+                this.darkMode = !this.darkMode;
+                localStorage.setItem('darkMode', this.darkMode);
+                this.updateDarkMode();
+            }
+
+            updateDarkMode() {
+                if (this.darkMode) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+
+            navigate(view) {
+                this.currentView = view;
+                this.render();
+            }
+
+            async handleNoteAdded() {
+                await this.loadNotes();
+                this.navigate('notes');
+            }
+
+            async handleNoteDeleted() {
+                await this.loadNotes();
+            }
+
+            render() {
+                const app = document.getElementById('app');
+                
+                switch(this.currentView) {
+                    case 'home':
+                        app.innerHTML = this.renderHome();
+                        break;
+                    case 'add':
+                        app.innerHTML = this.renderAddForm();
+                        break;
+                    case 'notes':
+                        app.innerHTML = this.renderNotesList();
+                        break;
+                    case 'search':
+                        app.innerHTML = this.renderSearch();
+                        break;
+                }
+
+                this.attachEventListeners();
+            }
+
+            renderHome() {
+                return `
+                    <div class="min-h-screen">
+                        ${this.renderHeader()}
+                        <main class="py-6">
+                            <div class="max-w-4xl mx-auto p-6">
+                                <div class="text-center mb-12">
+                                    <h1 class="text-5xl font-bold text-yellow-600 dark:text-yellow-400 mb-6">
+                                        Bilisa Notes
+                                    </h1>
+                                    <div class="bg-gradient-to-r from-blue-500 to-yellow-500 text-white p-8 rounded-2xl shadow-xl">
+                                        <p class="text-xl mb-4">
+                                            Bilisa, your future success starts here. Every note you save brings you closer to scoring high in Grade 12.
+                                        </p>
+                                        <p class="text-lg opacity-90">
+                                            Build your personal academic archive - offline, private, and forever yours.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                        <svg class="w-8 h-8 text-blue-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Total Notes</h3>
+                                        <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">${this.notes.length}</p>
+                                    </div>
+                                    
+                                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                        <svg class="w-8 h-8 text-yellow-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Subjects</h3>
+                                        <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">5</p>
+                                    </div>
+                                    
+                                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                        <svg class="w-8 h-8 text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                        </svg>
+                                        <h3 class="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Grades</h3>
+                                        <p class="text-3xl font-bold text-green-600 dark:text-green-400">4</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-wrap gap-4 justify-center">
+                                    <button onclick="app.navigate('add')" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                        Add New Note
+                                    </button>
+                                    
+                                    <button onclick="app.navigate('notes')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                        </svg>
+                                        View All Notes
+                                    </button>
+                                    
+                                    <button onclick="app.navigate('search')" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                        Search Notes
+                                    </button>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+
+            renderHeader() {
+                return `
+                    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="flex items-center justify-between h-16">
+                                <div class="flex items-center gap-6">
+                                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">Bilisa Archive</h1>
+                                    <nav class="hidden md:flex gap-4">
+                                        <button onclick="app.navigate('home')" class="px-3 py-2 rounded-md text-sm font-medium transition-colors ${this.currentView === 'home' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}">
+                                            Home
+                                        </button>
+                                        <button onclick="app.navigate('add')" class="px-3 py-2 rounded-md text-sm font-medium transition-colors ${this.currentView === 'add' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}">
+                                            Add Note
+                                        </button>
+                                        <button onclick="app.navigate('notes')" class="px-3 py-2 rounded-md text-sm font-medium transition-colors ${this.currentView === 'notes' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}">
+                                            My Notes
+                                        </button>
+                                        <button onclick="app.navigate('search')" class="px-3 py-2 rounded-md text-sm font-medium transition-colors ${this.currentView === 'search' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'}">
+                                            Search
+                                        </button>
+                                    </nav>
+                                </div>
+                                
+                                <button onclick="app.toggleDarkMode()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    ${this.darkMode ? 
+                                        '<svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>' :
+                                        '<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>'
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                    </header>
+                `;
+            }
+
+            renderAddForm() {
+                return `
+                    <div class="min-h-screen">
+                        ${this.renderHeader()}
+                        <main class="py-6">
+                            <div class="max-w-2xl mx-auto p-6">
+                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Add New Note</h2>
+                                        <p class="text-gray-600 dark:text-gray-400 mt-1">
+                                            Organize your study materials by grade, subject, and unit
+                                        </p>
+                                    </div>
+
+                                    <form id="noteForm" class="p-6 space-y-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                Note Title *
+                                            </label>
+                                            <input type="text" name="title" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" placeholder="e.g., Chemical Bonding Notes">
+                                        </div>
+
+                                        <div class="grid md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Grade *</label>
+                                                <select name="grade" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                                    <option value="">Select Grade</option>
+                                                    <option value="Grade 9">Grade 9</option>
+                                                    <option value="Grade 10">Grade 10</option>
+                                                    <option value="Grade 11">Grade 11</option>
+                                                    <option value="Grade 12">Grade 12</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject *</label>
+                                                <select name="subject" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                                    <option value="">Select Subject</option>
+                                                    <option value="Chemistry">Chemistry</option>
+                                                    <option value="Physics">Physics</option>
+                                                    <option value="Biology">Biology</option>
+                                                    <option value="Mathematics">Mathematics</option>
+                                                    <option value="English">English</option>
+                                                </select>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unit *</label>
+                                                <select name="unit" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+                                                    <option value="">Select Unit</option>
+                                                    ${Array.from({length: 11}, (_, i) => `<option value="Unit ${i + 1}">Unit ${i + 1}</option>`).join('')}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                Note Content *
+                                            </label>
+                                            <textarea name="content" rows="8" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" placeholder="Paste your study notes here..."></textarea>
+                                        </div>
+
+                                        <div id="message"></div>
+
+                                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2"></path>
+                                            </svg>
+                                            Save Note
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+
+            renderNotesList() {
+                return `
+                    <div class="min-h-screen">
+                        ${this.renderHeader()}
+                        <main class="py-6">
+                            <div class="max-w-6xl mx-auto p-6">
+                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">My Notes</h2>
+                                        <p class="text-gray-600 dark:text-gray-400 mt-1">${this.notes.length} notes</p>
+                                    </div>
+
+                                    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                                        ${this.notes.length === 0 ? 
+                                            '<div class="p-12 text-center"><svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg><h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No notes yet</h3><p class="text-gray-600 dark:text-gray-400">Start adding your first study note to build your archive.</p></div>' :
+                                            this.notes.map(note => this.renderNoteItem(note)).join('')
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+
+            renderNoteItem(note) {
+                const gradeColors = {
+                    'Grade 9': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+                    'Grade 10': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+                    'Grade 11': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+                    'Grade 12': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+                };
+
+                const subjectColors = {
+                    'Chemistry': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+                    'Physics': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+                    'Biology': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+                    'Mathematics': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+                    'English': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+                };
+
+                return `
+                    <div class="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex flex-wrap items-center gap-2 mb-3">
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium ${gradeColors[note.grade] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">${note.grade}</span>
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium ${subjectColors[note.subject] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">${note.subject}</span>
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">${note.unit}</span>
+                                </div>
+                                
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">${note.title}</h3>
+                                
+                                <div class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                    Created: ${new Date(note.timestamp).toLocaleDateString()}
+                                </div>
+                                
+                                ${note.content ? `<p class="text-gray-700 dark:text-gray-300 line-clamp-3">${note.content}</p>` : ''}
+                            </div>
+                            
+                            <div class="flex items-center gap-2 lg:ml-4">
+                                <button onclick="app.deleteNote(${note.id})" class="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderSearch() {
+                return `
+                    <div class="min-h-screen">
+                        ${this.renderHeader()}
+                        <main class="py-6">
+                            <div class="max-w-6xl mx-auto p-6">
+                                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Search Notes</h2>
+                                        
+                                        <div class="relative mb-6">
+                                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
+                                            <input type="text" id="searchInput" placeholder="Search by keywords, title, or content..." class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white text-lg">
+                                        </div>
+
+                                        <button onclick="app.performSearch()" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                                            Search
+                                        </button>
+                                    </div>
+
+                                    <div id="searchResults" class="p-6">
+                                        <div class="text-center py-12">
+                                            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
+                                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Start Searching Your Notes</h3>
+                                            <p class="text-gray-600 dark:text-gray-400">Enter keywords above to find specific notes quickly.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                `;
+            }
+
+            async deleteNote(id) {
+                if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+                    return;
+                }
+
+                const result = await NoteService.deleteNote(id);
+                if (result.success) {
+                    await this.handleNoteDeleted();
+                }
+            }
+
+            async performSearch() {
+                const searchInput = document.getElementById('searchInput');
+                const searchResults = document.getElementById('searchResults');
+                const query = searchInput.value.trim();
+
+                if (!query) {
+                    searchResults.innerHTML = `
+                        <div class="text-center py-12">
+                            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Enter Search Terms</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Please enter keywords to search for notes.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                searchResults.innerHTML = '<div class="flex items-center justify-center py-12"><div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div></div>';
+
+                const result = await NoteService.searchNotes({ keywords: query });
+
+                if (result.success && result.notes.length > 0) {
+                    searchResults.innerHTML = `
+                        <div class="mb-4">
+                            <p class="text-gray-600 dark:text-gray-400">Found ${result.notes.length} note${result.notes.length !== 1 ? 's' : ''}</p>
+                        </div>
+                        <div class="space-y-4">
+                            ${result.notes.map(note => this.renderNoteItem(note)).join('')}
+                        </div>
+                    `;
+                } else {
+                    searchResults.innerHTML = `
+                        <div class="text-center py-12">
+                            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No Notes Found</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Try adjusting your search terms to find what you're looking for.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            attachEventListeners() {
+                const form = document.getElementById('noteForm');
+                if (form) {
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        
+                        const formData = new FormData(form);
+                        const noteData = {
+                            title: formData.get('title'),
+                            grade: formData.get('grade'),
+                            subject: formData.get('subject'),
+                            unit: formData.get('unit'),
+                            content: formData.get('content')
+                        };
+
+                        const result = await NoteService.addNote(noteData);
+                        const messageDiv = document.getElementById('message');
+
+                        if (result.success) {
+                            messageDiv.innerHTML = `
+                                <div class="p-3 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
+                                    <p class="text-green-700 dark:text-green-300">Note saved successfully!</p>
+                                </div>
+                            `;
+                            form.reset();
+                            setTimeout(() => this.handleNoteAdded(), 1500);
+                        } else {
+                            messageDiv.innerHTML = `
+                                <div class="p-3 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+                                    <p class="text-red-700 dark:text-red-300">${result.error}</p>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.performSearch();
+                        }
+                    });
+                }
+            }
+        }
+
+        // Initialize the app
+        const app = new BilisaArchive();
+        window.app = app;
+    </script>
+</body>
+</html>
