@@ -40,38 +40,38 @@ const PasswordForm = () => {
         <source src="/videos/v2_watermarked-c61d724a-368d-4f77-bc38-7ab06ebfda59.mp4" type="video/mp4" />
       </video>
       
-      {/* Overlay for better readability */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/70 to-indigo-900/70 dark:from-gray-900/80 dark:to-gray-800/80"></div>
+      {/* Minimal overlay for glass effect */}
+      <div className="absolute inset-0 bg-black/10"></div>
       
       {/* Content */}
       <div className="relative z-10 w-full max-w-md p-4">
-        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8">
+        <div className="bg-white/20 dark:bg-gray-900/20 backdrop-blur-xl rounded-2xl border border-white/30 dark:border-white/10 p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-4 shadow-lg">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Bilisa Archive</h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">Enter password to access your notes</p>
+            <h2 className="text-3xl font-bold text-white drop-shadow-lg">Bilisa Archive</h2>
+            <p className="text-white/90 mt-2 drop-shadow-md">Enter password to access your notes</p>
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-red-500/80 backdrop-blur-md border border-red-400/50 text-white px-4 py-3 rounded-lg mb-6 shadow-lg">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2 drop-shadow-md">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/70" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full pl-10 pr-4 py-3 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md border border-white/40 dark:border-white/20 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white placeholder-white/50"
                   placeholder="••••••••"
                   required
                   autoFocus
@@ -82,7 +82,7 @@ const PasswordForm = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-white/30 dark:bg-white/20 backdrop-blur-md border border-white/50 dark:border-white/30 text-white py-3 rounded-lg font-semibold hover:bg-white/40 dark:hover:bg-white/30 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
               {loading ? (
                 <span className="animate-spin">⏳</span>
