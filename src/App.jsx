@@ -3,20 +3,18 @@ import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, B
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
-import LoginForm from './components/Auth/LoginForm';
-import SignupForm from './components/Auth/SignupForm';
+import PasswordForm from './components/Auth/PasswordForm';
 import { NoteService } from './db';
-import { useAuth } from './firebase/AuthProvider';
+import { useSimpleAuth } from './auth/SimpleAuthProvider';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [currentView, setCurrentView] = useState('home');
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalNotes: 0, gradeStats: {} });
   
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { isAuthenticated, loading: authLoading, signOut } = useSimpleAuth();
 
   useEffect(() => {
     // Check for saved dark mode preference
@@ -26,11 +24,11 @@ function App() {
 
   useEffect(() => {
     // Load initial notes only when user is authenticated
-    if (user) {
+    if (isAuthenticated) {
       loadNotes();
       loadStats();
     }
-  }, [user]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     // Apply dark mode class to document
@@ -81,13 +79,9 @@ function App() {
   };
 
   const renderContent = () => {
-    // Show authentication screens if user is not authenticated
-    if (!user) {
-      if (authMode === 'login') {
-        return <LoginForm onToggleMode={() => setAuthMode('signup')} />;
-      } else {
-        return <SignupForm onToggleMode={() => setAuthMode('login')} />;
-      }
+    // Show authentication screen if user is not authenticated
+    if (!isAuthenticated) {
+      return <PasswordForm />;
     }
 
     switch (currentView) {
@@ -260,7 +254,7 @@ function App() {
             </div>
             
             <div className="flex items-center gap-2">
-              {user && (
+              {isAuthenticated && (
                 <button
                   onClick={handleSignOut}
                   className="feature-icon hover-lift animate-pulse-slow"
