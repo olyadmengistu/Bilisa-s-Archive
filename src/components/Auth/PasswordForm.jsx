@@ -33,7 +33,6 @@ const PasswordForm = () => {
       <video
         autoPlay
         loop
-        muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
