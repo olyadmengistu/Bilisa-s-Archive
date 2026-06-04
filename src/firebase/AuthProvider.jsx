@@ -1,49 +1,53 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService } from './auth';
-import { firestoreService } from './firestore';
+// DEPRECATED: This file is no longer used. The app now uses SimpleAuthProvider.
+// This file is kept for reference but should not be imported.
+// If you're seeing React Error #321, make sure this file is not being imported anywhere.
 
-const AuthContext = createContext(null);
+// import React, { createContext, useContext, useState, useEffect } from 'react';
+// import { authService } from './auth';
+// import { firestoreService } from './firestore';
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+// const AuthContext = createContext(null);
 
-  useEffect(() => {
-    // Enable offline persistence
-    firestoreService.enableOfflinePersistence();
+// export const AuthProvider = ({ children }) => {
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true);
 
-    // Listen to auth state changes
-    const unsubscribe = authService.onAuthStateChanged((user) => {
-      setUser(user);
-      setLoading(false);
-    });
+//   useEffect(() => {
+//     // Enable offline persistence
+//     firestoreService.enableOfflinePersistence();
 
-    return () => unsubscribe();
-  }, []);
+//     // Listen to auth state changes
+//     const unsubscribe = authService.onAuthStateChanged((user) => {
+//       setUser(user);
+//       setLoading(false);
+//     });
 
-  const value = {
-    user,
-    loading,
-    signUp: authService.signUp,
-    signIn: authService.signIn,
-    signInWithGoogle: authService.signInWithGoogle,
-    signOut: authService.signOut,
-    getCurrentUser: authService.getCurrentUser
-  };
+//     return () => unsubscribe();
+//   }, []);
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+//   const value = {
+//     user,
+//     loading,
+//     signUp: authService.signUp,
+//     signIn: authService.signIn,
+//     signInWithGoogle: authService.signInWithGoogle,
+//     signOut: authService.signOut,
+//     getCurrentUser: authService.getCurrentUser
+//   };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+//   return (
+//     <AuthContext.Provider value={value}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
 
-export default AuthProvider;
+// export const useAuth = () => {
+//   const context = useContext(AuthContext);
+//   if (!context) {
+//     throw new Error('useAuth must be used within an AuthProvider');
+//   }
+//   return context;
+// };
+
+// export default AuthProvider;

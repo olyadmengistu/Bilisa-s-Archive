@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, UserPlus, Chrome } from 'lucide-react';
-import { useAuth } from '../../firebase/AuthProvider';
+import { useSimpleAuth } from '../../auth/SimpleAuthProvider';
 
 const SignupForm = ({ onToggleMode }) => {
   const [displayName, setDisplayName] = useState('');
@@ -10,7 +10,7 @@ const SignupForm = ({ onToggleMode }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signIn } = useSimpleAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,14 +21,10 @@ const SignupForm = ({ onToggleMode }) => {
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
     setLoading(true);
 
-    const result = await signUp(email, password, displayName);
+    // SimpleAuthProvider only accepts password, not email
+    const result = await signIn(password);
     
     if (!result.success) {
       setError(result.error);
@@ -38,16 +34,7 @@ const SignupForm = ({ onToggleMode }) => {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('');
-    setLoading(true);
-
-    const result = await signInWithGoogle();
-    
-    if (!result.success) {
-      setError(result.error);
-    }
-    
-    setLoading(false);
+    setError('Google sign-in is not available. Please use the password instead.');
   };
 
   return (

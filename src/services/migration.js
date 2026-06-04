@@ -1,6 +1,8 @@
 import Dexie from 'dexie';
 import { firestoreService } from '../firebase/firestore';
-import { authService } from '../firebase/auth';
+
+// Fixed user ID for single-user password-based app
+const SINGLE_USER_ID = 'bilisa-archive-user';
 
 // Migration script to move data from Dexie (IndexedDB) to Firebase Firestore
 export class DataMigration {
@@ -8,13 +10,7 @@ export class DataMigration {
     try {
       console.log('Starting migration from Dexie to Firebase...');
 
-      // Check if user is authenticated
-      const user = authService.getCurrentUser();
-      if (!user) {
-        throw new Error('User must be authenticated to migrate data');
-      }
-
-      console.log(`Authenticated as: ${user.email}`);
+      console.log(`Using single user ID: ${SINGLE_USER_ID}`);
 
       // Initialize Dexie database
       const db = new Dexie('BilisaArchive');
@@ -52,7 +48,7 @@ export class DataMigration {
           };
 
           // Add note to Firebase
-          const result = await firestoreService.addNote(user.uid, noteData);
+          const result = await firestoreService.addNote(SINGLE_USER_ID, noteData);
           
           if (result.success) {
             migratedCount++;
@@ -98,13 +94,8 @@ export class DataMigration {
       });
 
       const dexieCount = await db.notes.count();
-      
-      const user = authService.getCurrentUser();
-      if (!user) {
-        return { needsMigration: false, reason: 'User not authenticated' };
-      }
 
-      const firebaseResult = await firestoreService.getAllNotes(user.uid);
+      const firebaseResult = await firestoreService.getAllNotes(SINGLE_USER_ID);
       const firebaseCount = firebaseResult.success ? firebaseResult.notes.length : 0;
 
       console.log(`Dexie notes: ${dexieCount}, Firebase notes: ${firebaseCount}`);

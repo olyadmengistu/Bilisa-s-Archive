@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, LogIn, Chrome } from 'lucide-react';
-import { useAuth } from '../../firebase/AuthProvider';
+import { useSimpleAuth } from '../../auth/SimpleAuthProvider';
 
 const LoginForm = ({ onToggleMode }) => {
   const [email, setEmail] = useState('');
@@ -8,14 +8,15 @@ const LoginForm = ({ onToggleMode }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn } = useSimpleAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    const result = await signIn(email, password);
+    // SimpleAuthProvider only accepts password, not email
+    const result = await signIn(password);
     
     if (!result.success) {
       setError(result.error);
@@ -25,16 +26,7 @@ const LoginForm = ({ onToggleMode }) => {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('');
-    setLoading(true);
-
-    const result = await signInWithGoogle();
-    
-    if (!result.success) {
-      setError(result.error);
-    }
-    
-    setLoading(false);
+    setError('Google sign-in is not available. Please use the password instead.');
   };
 
   return (

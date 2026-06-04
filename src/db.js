@@ -1,72 +1,32 @@
 import { firestoreService } from './firebase/firestore';
-import { useAuth } from './firebase/AuthProvider';
 
-// Firebase-based NoteService
+// Fixed user ID for single-user password-based app
+const SINGLE_USER_ID = 'bilisa-archive-user';
+
+// NoteService for single-user password-based app
 export class NoteService {
   static async addNote(noteData) {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.addNote(user.uid, noteData);
+    return await firestoreService.addNote(SINGLE_USER_ID, noteData);
   }
 
   static async getAllNotes() {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.getAllNotes(user.uid);
+    return await firestoreService.getAllNotes(SINGLE_USER_ID);
   }
 
   static async searchNotes(filters = {}) {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.searchNotes(user.uid, filters);
+    return await firestoreService.searchNotes(SINGLE_USER_ID, filters);
   }
 
   static async getNoteById(id) {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.getNoteById(user.uid, id);
+    return await firestoreService.getNoteById(SINGLE_USER_ID, id);
   }
 
   static async deleteNote(id) {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.deleteNote(user.uid, id);
+    return await firestoreService.deleteNote(SINGLE_USER_ID, id);
   }
 
   static async updateNote(id, updateData) {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.updateNote(user.uid, id, updateData);
+    return await firestoreService.updateNote(SINGLE_USER_ID, id, updateData);
   }
 
   static extractKeywords(content) {
@@ -74,19 +34,12 @@ export class NoteService {
   }
 
   static async getStats() {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
-    
-    if (!user) {
-      return { success: false, error: 'User must be authenticated' };
-    }
-
-    return await firestoreService.getStats(user.uid);
+    return await firestoreService.getStats(SINGLE_USER_ID);
   }
 
   // Real-time listener for notes
-  static onNotesChange(userId, callback) {
-    return firestoreService.onNotesChange(userId, callback);
+  static onNotesChange(callback) {
+    return firestoreService.onNotesChange(SINGLE_USER_ID, callback);
   }
 }
 
