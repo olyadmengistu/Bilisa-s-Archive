@@ -1,26 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award } from 'lucide-react';
+import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award, LogOut } from 'lucide-react';
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
+import LoginForm from './components/Auth/LoginForm';
+import SignupForm from './components/Auth/SignupForm';
 import { NoteService } from './db';
+import { useAuth } from './firebase/AuthProvider';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [currentView, setCurrentView] = useState('home');
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalNotes: 0, gradeStats: {} });
+  
+  const { user, loading: authLoading, signOut } = useAuth();
 
   useEffect(() => {
     // Check for saved dark mode preference
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     setDarkMode(savedDarkMode);
-    
-    // Load initial notes
-    loadNotes();
-    loadStats();
   }, []);
+
+  useEffect(() => {
+    // Load initial notes only when user is authenticated
+    if (user) {
+      loadNotes();
+      loadStats();
+    }
+  }, [user]);
 
   useEffect(() => {
     // Apply dark mode class to document
@@ -52,6 +62,13 @@ function App() {
     setDarkMode(!darkMode);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    setCurrentView('home');
+    setNotes([]);
+    setStats({ totalNotes: 0, gradeStats: {} });
+  };
+
   const handleNoteAdded = () => {
     loadNotes();
     loadStats();
@@ -64,6 +81,15 @@ function App() {
   };
 
   const renderContent = () => {
+    // Show authentication screens if user is not authenticated
+    if (!user) {
+      if (authMode === 'login') {
+        return <LoginForm onToggleMode={() => setAuthMode('signup')} />;
+      } else {
+        return <SignupForm onToggleMode={() => setAuthMode('login')} />;
+      }
+    }
+
     switch (currentView) {
       case 'home':
         return (
@@ -86,7 +112,7 @@ function App() {
                   Bilisa, your future success starts here. Every note you save brings you closer to scoring high in Grade 12.
                 </p>
                 <p className="text-lg opacity-90 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-                  Build your personal academic archive - offline, private, and forever yours.
+                  Build your personal academic archive - secure, synchronized, and accessible anywhere.
                 </p>
               </div>
             </div>
@@ -233,17 +259,29 @@ function App() {
               </nav>
             </div>
             
-            <button
-              onClick={toggleDarkMode}
-              className="feature-icon hover-lift animate-pulse-slow"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
+            <div className="flex items-center gap-2">
+              {user && (
+                <button
+                  onClick={handleSignOut}
+                  className="feature-icon hover-lift animate-pulse-slow"
+                  aria-label="Sign out"
+                  title="Sign out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
               )}
-            </button>
+              <button
+                onClick={toggleDarkMode}
+                className="feature-icon hover-lift animate-pulse-slow"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </header>
