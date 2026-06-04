@@ -16,12 +16,18 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+console.log('Initializing Firebase with config:', firebaseConfig);
 const app = initializeApp(firebaseConfig);
+console.log('Firebase app initialized:', app);
 const analytics = getAnalytics(app);
+console.log('Firebase analytics initialized:', analytics);
 
 // Initialize Firebase services
 export const auth = getAuth(app);
+console.log('Firebase auth initialized:', auth);
 export const db = getFirestore(app);
+console.log('Firebase Firestore initialized:', db);
 export const storage = getStorage(app);
+console.log('Firebase Storage initialized:', storage);
 
 export default app;

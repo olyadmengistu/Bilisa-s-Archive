@@ -85,6 +85,8 @@ export default function NoteForm({ onNoteAdded }) {
     setLoading(true);
 
     try {
+      console.log('Starting note save process...');
+      
       // Validation
       if (!formData.title.trim()) {
         throw new Error('Please enter a title for your note.');
@@ -104,7 +106,9 @@ export default function NoteForm({ onNoteAdded }) {
 
       let pdfData = null;
       if (formData.pdfFile) {
+        console.log('Reading PDF file...');
         pdfData = await readPdfAsBase64(formData.pdfFile);
+        console.log('PDF file read successfully');
       }
 
       const noteData = {
@@ -117,7 +121,9 @@ export default function NoteForm({ onNoteAdded }) {
         pdfName: formData.pdfFile ? formData.pdfFile.name : null
       };
 
+      console.log('Calling NoteService.addNote with data:', noteData);
       const result = await NoteService.addNote(noteData);
+      console.log('NoteService.addNote returned:', result);
 
       if (result.success) {
         setSuccess('Note saved successfully!');
@@ -137,8 +143,10 @@ export default function NoteForm({ onNoteAdded }) {
         throw new Error(result.error);
       }
     } catch (err) {
+      console.error('Error saving note:', err);
       setError(err.message);
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
     }
   };

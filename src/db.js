@@ -6,7 +6,11 @@ const SINGLE_USER_ID = 'bilisa-archive-user';
 // NoteService for single-user password-based app
 export class NoteService {
   static async addNote(noteData) {
-    return await firestoreService.addNote(SINGLE_USER_ID, noteData);
+    console.log('NoteService.addNote called with userId:', SINGLE_USER_ID);
+    console.log('NoteService.addNote noteData:', noteData);
+    const result = await firestoreService.addNote(SINGLE_USER_ID, noteData);
+    console.log('NoteService.addNote result:', result);
+    return result;
   }
 
   static async getAllNotes() {

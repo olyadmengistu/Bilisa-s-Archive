@@ -26,32 +26,27 @@ export const firestoreService = {
   // Add a new note
   async addNote(userId, noteData) {
     try {
+      console.log('firestoreService.addNote called with userId:', userId);
+      console.log('firestoreService.addNote noteData:', noteData);
+      
       const noteRef = collection(db, USERS_COLLECTION, userId, NOTES_COLLECTION);
+      console.log('Created noteRef:', noteRef);
       
-      // Check for duplicates by querying existing notes with same metadata
-      const q = query(
-        noteRef,
-        where('grade', '==', noteData.grade),
-        where('subject', '==', noteData.subject),
-        where('unit', '==', noteData.unit),
-        where('title', '==', noteData.title)
-      );
-      const querySnapshot = await getDocs(q);
-      
-      if (!querySnapshot.empty) {
-        throw new Error('A note with this title already exists for this grade, subject, and unit.');
-      }
-
+      console.log('Preparing note with timestamp...');
       const noteWithTimestamp = {
         ...noteData,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         keywords: this.extractKeywords(noteData.content || '')
       };
+      console.log('noteWithTimestamp:', noteWithTimestamp);
 
+      console.log('Adding document to Firestore...');
       const docRef = await addDoc(noteRef, noteWithTimestamp);
+      console.log('Document added successfully with ID:', docRef.id);
       return { success: true, id: docRef.id };
     } catch (error) {
+      console.error('Error in firestoreService.addNote:', error);
       return { success: false, error: error.message };
     }
   },
