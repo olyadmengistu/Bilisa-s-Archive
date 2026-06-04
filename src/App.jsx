@@ -87,22 +87,22 @@ function App() {
     switch (currentView) {
       case 'home':
         return (
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-            <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-fadeInDown">
-              <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+            <div className="text-center mb-10 sm:mb-12 lg:mb-16 animate-fadeInDown">
+              <div className="inline-flex items-center gap-3 mb-6">
                 <div className="feature-icon gradient-primary animate-float">
                   <Brain className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold logo-bilisa animate-scaleIn">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold logo-bilisa animate-scaleIn">
                   Bilisa Notes
                 </h1>
-                <div className="feature-icon gradient-bilisa animate-float" style={{animationDelay: '0.5s'}}>
+                <div className="feature-icon gradient-secondary animate-float" style={{animationDelay: '0.5s'}}>
                   <Sparkles className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
               </div>
               
-              <div className="gradient-warm text-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl animate-glow max-w-4xl mx-auto">
-                <p className="text-base sm:text-lg lg:text-2xl mb-2 sm:mb-4 font-semibold animate-fadeInUp">
+              <div className="gradient-hero text-white p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl animate-glow max-w-4xl mx-auto">
+                <p className="text-base sm:text-lg lg:text-xl mb-2 sm:mb-3 font-semibold animate-fadeInUp">
                   Bilisa, your future success starts here. Every note you save brings you closer to scoring high in Grade 12.
                 </p>
                 <p className="text-sm sm:text-base lg:text-lg opacity-90 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
@@ -111,67 +111,67 @@ function App() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 lg:mb-12">
-              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-200 dark:border-gray-700 card-hover hover-lift animate-slideInLeft">
-                <div className="feature-icon gradient-primary mb-3 sm:mb-4 animate-pulse-slow">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-10 sm:mb-12 lg:mb-16">
+              <div className="modern-card p-6 sm:p-8 card-hover hover-lift animate-slideInLeft">
+                <div className="feature-icon gradient-primary mb-4 animate-pulse-slow">
                   <BookOpen className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="font-bold text-lg sm:text-xl mb-2 sm:mb-3 text-gray-900 dark:text-white">Total Notes</h3>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-600 dark:text-primary-400 animate-scaleIn">{stats.totalNotes}</p>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Knowledge stored</p>
+                <h3 className="font-bold text-lg sm:text-xl mb-2 text-slate-900 dark:text-white">Total Notes</h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-indigo-600 dark:text-indigo-400 animate-scaleIn">{stats.totalNotes}</p>
+                <p className="text-slate-600 dark:text-slate-400 mt-2 text-sm sm:text-base">Knowledge stored</p>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-200 dark:border-gray-700 card-hover hover-lift animate-fadeInUp">
-                <div className="feature-icon gradient-bilisa mb-3 sm:mb-4 animate-pulse-slow" style={{animationDelay: '0.3s'}}>
+              <div className="modern-card p-6 sm:p-8 card-hover hover-lift animate-fadeInUp">
+                <div className="feature-icon gradient-secondary mb-4 animate-pulse-slow" style={{animationDelay: '0.3s'}}>
                   <Target className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="font-bold text-lg sm:text-xl mb-2 sm:mb-3 text-gray-900 dark:text-white">Subjects</h3>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-bilisa-600 dark:text-bilisa-400 animate-scaleIn" style={{animationDelay: '0.2s'}}>5</p>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Academic areas</p>
+                <h3 className="font-bold text-lg sm:text-xl mb-2 text-slate-900 dark:text-white">Subjects</h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-cyan-600 dark:text-cyan-400 animate-scaleIn" style={{animationDelay: '0.2s'}}>5</p>
+                <p className="text-slate-600 dark:text-slate-400 mt-2 text-sm sm:text-base">Academic areas</p>
               </div>
               
-              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-200 dark:border-gray-700 card-hover hover-lift animate-slideInRight sm:col-span-2 lg:col-span-1">
-                <div className="feature-icon gradient-success mb-3 sm:mb-4 animate-pulse-slow" style={{animationDelay: '0.6s'}}>
+              <div className="modern-card p-6 sm:p-8 card-hover hover-lift animate-slideInRight sm:col-span-2 lg:col-span-1">
+                <div className="feature-icon gradient-success mb-4 animate-pulse-slow" style={{animationDelay: '0.6s'}}>
                   <Award className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <h3 className="font-bold text-lg sm:text-xl mb-2 sm:mb-3 text-gray-900 dark:text-white">Grades</h3>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-600 dark:text-green-400 animate-scaleIn" style={{animationDelay: '0.4s'}}>4</p>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 text-sm sm:text-base">Grade levels</p>
+                <h3 className="font-bold text-lg sm:text-xl mb-2 text-slate-900 dark:text-white">Grades</h3>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-600 dark:text-emerald-400 animate-scaleIn" style={{animationDelay: '0.4s'}}>4</p>
+                <p className="text-slate-600 dark:text-slate-400 mt-2 text-sm sm:text-base">Grade levels</p>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-6 justify-center animate-fadeInUp" style={{animationDelay: '0.6s'}}>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center animate-fadeInUp" style={{animationDelay: '0.6s'}}>
               <button
                 onClick={() => setCurrentView('add')}
-                className="btn-animated gradient-primary text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-3 hover-lift text-sm sm:text-base lg:text-lg shadow-lg w-full sm:w-auto"
+                className="btn-animated gradient-primary text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 rounded-xl font-semibold flex items-center justify-center gap-3 hover-lift text-sm sm:text-base lg:text-lg shadow-md w-full sm:w-auto"
               >
-                <div className="feature-icon" style={{width: '32px', height: '32px', fontSize: '14px'}}>
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                <div className="feature-icon" style={{width: '36px', height: '36px', fontSize: '14px'}}>
+                  <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 Add New Note
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
               </button>
               
               <button
                 onClick={() => setCurrentView('notes')}
-                className="btn-animated gradient-bilisa text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-3 hover-lift text-sm sm:text-base lg:text-lg shadow-lg w-full sm:w-auto"
+                className="btn-animated gradient-secondary text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 rounded-xl font-semibold flex items-center justify-center gap-3 hover-lift text-sm sm:text-base lg:text-lg shadow-md w-full sm:w-auto"
               >
-                <div className="feature-icon" style={{width: '32px', height: '32px', fontSize: '14px'}}>
-                  <Archive className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                <div className="feature-icon" style={{width: '36px', height: '36px', fontSize: '14px'}}>
+                  <Archive className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 View All Notes
-                <Brain className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
               </button>
               
               <button
                 onClick={() => setCurrentView('search')}
-                className="btn-animated gradient-success text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-3 hover-lift text-sm sm:text-base lg:text-lg shadow-lg w-full sm:w-auto"
+                className="btn-animated gradient-success text-white px-6 sm:px-8 lg:px-10 py-3 sm:py-4 rounded-xl font-semibold flex items-center justify-center gap-3 hover-lift text-sm sm:text-base lg:text-lg shadow-md w-full sm:w-auto"
               >
-                <div className="feature-icon" style={{width: '32px', height: '32px', fontSize: '14px'}}>
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
+                <div className="feature-icon" style={{width: '36px', height: '36px', fontSize: '14px'}}>
+                  <Search className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 Search Notes
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
+                <Target className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
               </button>
             </div>
           </div>
@@ -192,88 +192,88 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors">
       {/* Header */}
       {isAuthenticated && (
-        <header className="glass shadow-lg border-b border-gray-200 dark:border-gray-700 animate-fadeInDown">
+        <header className="glass shadow-sm border-b border-slate-200 dark:border-slate-700 animate-fadeInDown">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            <div className="flex items-center gap-3 sm:gap-6">
+          <div className="flex items-center justify-between h-16 sm:h-18">
+            <div className="flex items-center gap-4 sm:gap-8">
               <div className="flex items-center gap-2">
-                <div className="feature-icon gradient-primary" style={{width: '28px', height: '28px', fontSize: '12px'}}>
+                <div className="feature-icon gradient-primary" style={{width: '32px', height: '32px', fontSize: '14px'}}>
                   <Brain className="w-4 h-4" />
                 </div>
-                <h1 className="text-base sm:text-lg lg:text-xl font-bold logo-bilisa">Bilisa Archive</h1>
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 animate-pulse" />
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold logo-bilisa">Bilisa Archive</h1>
+                <Sparkles className="w-4 h-4 text-indigo-500 animate-pulse" />
               </div>
-              <nav className="hidden md:flex gap-1 sm:gap-2">
+              <nav className="hidden md:flex gap-1">
                 <button
                   onClick={() => setCurrentView('home')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-lift ${
                     currentView === 'home'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'gradient-primary text-white shadow-md'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <Home className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+                  <Home className="w-4 h-4 inline mr-2" />
                   Home
                 </button>
                 <button
                   onClick={() => setCurrentView('add')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-lift ${
                     currentView === 'add'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'gradient-primary text-white shadow-md'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+                  <Plus className="w-4 h-4 inline mr-2" />
                   Add Note
                 </button>
                 <button
                   onClick={() => setCurrentView('notes')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-lift ${
                     currentView === 'notes'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'gradient-primary text-white shadow-md'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <Archive className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+                  <Archive className="w-4 h-4 inline mr-2" />
                   My Notes
                 </button>
                 <button
                   onClick={() => setCurrentView('search')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover-lift ${
                     currentView === 'search'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'gradient-primary text-white shadow-md'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
-                  <Search className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+                  <Search className="w-4 h-4 inline mr-2" />
                   Search
                 </button>
               </nav>
             </div>
             
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2">
               {isAuthenticated && (
                 <button
                   onClick={handleSignOut}
-                  className="feature-icon hover-lift animate-pulse-slow p-1 sm:p-2"
+                  className="feature-icon hover-lift p-2"
                   aria-label="Sign out"
                   title="Sign out"
                 >
-                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <LogOut className="w-4 h-4" />
                 </button>
               )}
               <button
                 onClick={toggleDarkMode}
-                className="feature-icon hover-lift animate-pulse-slow p-1 sm:p-2"
+                className="feature-icon hover-lift p-2"
                 aria-label="Toggle dark mode"
               >
                 {darkMode ? (
-                  <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Sun className="w-4 h-4" />
                 ) : (
-                  <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Moon className="w-4 h-4" />
                 )}
               </button>
             </div>
@@ -284,50 +284,50 @@ function App() {
 
       {/* Mobile Navigation */}
       {isAuthenticated && (
-        <div className="md:hidden glass border-b border-gray-200 dark:border-gray-700 animate-fadeInDown">
-        <div className="flex justify-around py-2 sm:py-3">
+        <div className="md:hidden glass border-b border-slate-200 dark:border-slate-700 animate-fadeInDown">
+        <div className="flex justify-around py-3">
           <button
             onClick={() => setCurrentView('home')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
+            className={`flex flex-col items-center p-3 rounded-xl text-xs transition-all duration-200 hover-lift ${
               currentView === 'home'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'gradient-primary text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            <Home className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+            <Home className="w-5 h-5 mb-1" />
             Home
           </button>
           <button
             onClick={() => setCurrentView('add')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
+            className={`flex flex-col items-center p-3 rounded-xl text-xs transition-all duration-200 hover-lift ${
               currentView === 'add'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'gradient-primary text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+            <Plus className="w-5 h-5 mb-1" />
             Add
           </button>
           <button
             onClick={() => setCurrentView('notes')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
+            className={`flex flex-col items-center p-3 rounded-xl text-xs transition-all duration-200 hover-lift ${
               currentView === 'notes'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'gradient-primary text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            <Archive className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+            <Archive className="w-5 h-5 mb-1" />
             Notes
           </button>
           <button
             onClick={() => setCurrentView('search')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
+            className={`flex flex-col items-center p-3 rounded-xl text-xs transition-all duration-200 hover-lift ${
               currentView === 'search'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'gradient-primary text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            <Search className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
+            <Search className="w-5 h-5 mb-1" />
             Search
           </button>
         </div>
@@ -335,7 +335,7 @@ function App() {
       )}
 
       {/* Main Content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {renderContent()}
       </main>
     </div>

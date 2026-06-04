@@ -173,10 +173,10 @@ export default function NoteForm({ onNoteAdded }) {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Add New Note</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+      <div className="modern-card">
+        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Add New Note</h2>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Organize your study materials by grade, subject, and unit
           </p>
         </div>
@@ -184,7 +184,7 @@ export default function NoteForm({ onNoteAdded }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Note Title *
             </label>
             <input
@@ -192,7 +192,7 @@ export default function NoteForm({ onNoteAdded }) {
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
               placeholder="e.g., Chemical Bonding Notes"
               required
             />
@@ -201,14 +201,14 @@ export default function NoteForm({ onNoteAdded }) {
           {/* Grade, Subject, Unit */}
           <div className="grid md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Grade *
               </label>
               <select
                 name="grade"
                 value={formData.grade}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
                 required
               >
                 <option value="">Select Grade</option>
@@ -219,14 +219,14 @@ export default function NoteForm({ onNoteAdded }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Subject *
               </label>
               <select
                 name="subject"
                 value={formData.subject}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
                 required
               >
                 <option value="">Select Subject</option>
@@ -237,14 +237,14 @@ export default function NoteForm({ onNoteAdded }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Unit *
               </label>
               <select
                 name="unit"
                 value={formData.unit}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
                 required
               >
                 <option value="">Select Unit</option>
@@ -257,7 +257,7 @@ export default function NoteForm({ onNoteAdded }) {
 
           {/* Content Type Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Content Type
             </label>
             <div className="flex gap-4">
@@ -266,8 +266,8 @@ export default function NoteForm({ onNoteAdded }) {
                 onClick={() => setFormData(prev => ({ ...prev, pdfFile: null }))}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-colors ${
                   !formData.pdfFile
-                    ? 'border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
-                    : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400'
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+                    : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400'
                 }`}
               >
                 <FileText className="w-4 h-4" />
@@ -276,8 +276,8 @@ export default function NoteForm({ onNoteAdded }) {
               
               <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-colors ${
                 formData.pdfFile
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
-                  : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400'
+                  ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300'
+                  : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-400'
               }`}>
                 <Upload className="w-4 h-4" />
                 PDF File
@@ -294,7 +294,7 @@ export default function NoteForm({ onNoteAdded }) {
           {/* Text Content */}
           {!formData.pdfFile && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Note Content *
               </label>
               <textarea
@@ -302,7 +302,7 @@ export default function NoteForm({ onNoteAdded }) {
                 value={formData.content}
                 onChange={handleInputChange}
                 rows={8}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
                 placeholder="Paste your study notes here..."
                 required
               />
@@ -312,15 +312,15 @@ export default function NoteForm({ onNoteAdded }) {
           {/* PDF Upload */}
           {formData.pdfFile && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 PDF File
               </label>
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600">
                 <div className="flex items-center gap-3">
                   <FileText className="w-8 h-8 text-red-500" />
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{formData.pdfFile.name}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="font-medium text-slate-900 dark:text-white">{formData.pdfFile.name}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
                       {(formData.pdfFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -329,7 +329,7 @@ export default function NoteForm({ onNoteAdded }) {
                   <button
                     type="button"
                     onClick={viewPdf}
-                    className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-lg transition-colors"
+                    className="p-2 text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-900 rounded-lg transition-colors"
                     title="View PDF"
                   >
                     <Eye className="w-5 h-5" />
@@ -356,8 +356,8 @@ export default function NoteForm({ onNoteAdded }) {
           )}
 
           {success && (
-            <div className="p-3 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg">
-              <p className="text-green-700 dark:text-green-300">{success}</p>
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-900 border border-emerald-200 dark:border-emerald-700 rounded-lg">
+              <p className="text-emerald-700 dark:text-emerald-300">{success}</p>
             </div>
           )}
 
@@ -365,7 +365,7 @@ export default function NoteForm({ onNoteAdded }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full gradient-primary hover:opacity-90 disabled:opacity-50 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
           >
             {loading ? (
               <>
