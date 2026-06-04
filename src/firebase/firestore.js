@@ -22,6 +22,22 @@ import { db } from './config';
 const NOTES_COLLECTION = 'notes';
 const USERS_COLLECTION = 'users';
 
+// Test Firebase connectivity
+export const testFirebaseConnectivity = async () => {
+  try {
+    console.log('Testing Firebase connectivity...');
+    const testRef = collection(db, 'test');
+    const testDoc = await addDoc(testRef, { test: true, timestamp: new Date().toISOString() });
+    console.log('Firebase connectivity test passed, doc ID:', testDoc.id);
+    await deleteDoc(doc(db, 'test', testDoc.id));
+    console.log('Test document deleted');
+    return { success: true };
+  } catch (error) {
+    console.error('Firebase connectivity test failed:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 export const firestoreService = {
   // Add a new note
   async addNote(userId, noteData) {
@@ -32,11 +48,11 @@ export const firestoreService = {
       const noteRef = collection(db, USERS_COLLECTION, userId, NOTES_COLLECTION);
       console.log('Created noteRef:', noteRef);
       
-      console.log('Preparing note with timestamp...');
+      console.log('Preparing note with simple timestamp...');
       const noteWithTimestamp = {
         ...noteData,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         keywords: this.extractKeywords(noteData.content || '')
       };
       console.log('noteWithTimestamp:', noteWithTimestamp);
@@ -47,7 +63,22 @@ export const firestoreService = {
       return { success: true, id: docRef.id };
     } catch (error) {
       console.error('Error in firestoreService.addNote:', error);
-      return { success: false, error: error.message };
+      console.error('Error details:', error.code, error.message);
+      
+      let errorMessage = error.message;
+      
+      // Provide more helpful error messages based on error code
+      if (error.code === 'permission-denied') {
+        errorMessage = 'Permission denied. Please check your Firestore database rules in the Firebase console. The database might be set to deny all writes.';
+      } else if (error.code === 'unavailable') {
+        errorMessage = 'Firestore service is unavailable. Please check your internet connection and ensure Firestore is enabled in your Firebase project.';
+      } else if (error.code === 'not-found') {
+        errorMessage = 'Firestore database not found. Please ensure Firestore is enabled in your Firebase project console.';
+      } else if (error.code === 'failed-precondition') {
+        errorMessage = 'Firestore operation failed. This might be due to missing indexes or database configuration issues.';
+      }
+      
+      return { success: false, error: errorMessage };
     }
   },
 

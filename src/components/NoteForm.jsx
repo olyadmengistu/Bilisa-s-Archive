@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Save, Upload, FileText, X, AlertCircle, Eye } from 'lucide-react';
 import { NoteService } from '../db';
+import { testFirebaseConnectivity } from '../firebase/firestore';
 
 const GRADES = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
@@ -87,6 +88,15 @@ export default function NoteForm({ onNoteAdded }) {
     try {
       console.log('Starting note save process...');
       
+      // Test Firebase connectivity first
+      console.log('Testing Firebase connectivity...');
+      const connectivityTest = await testFirebaseConnectivity();
+      console.log('Firebase connectivity test result:', connectivityTest);
+      
+      if (!connectivityTest.success) {
+        throw new Error(`Firebase connection failed: ${connectivityTest.error}. Please check your internet connection and Firebase configuration.`);
+      }
+      
       // Validation
       if (!formData.title.trim()) {
         throw new Error('Please enter a title for your note.');
@@ -122,7 +132,17 @@ export default function NoteForm({ onNoteAdded }) {
       };
 
       console.log('Calling NoteService.addNote with data:', noteData);
-      const result = await NoteService.addNote(noteData);
+      
+      // Add timeout to prevent endless loading
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Save operation timed out after 30 seconds')), 30000);
+      });
+      
+      const result = await Promise.race([
+        NoteService.addNote(noteData),
+        timeoutPromise
+      ]);
+      
       console.log('NoteService.addNote returned:', result);
 
       if (result.success) {
