@@ -118,21 +118,21 @@ export default function SearchView() {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="modern-card">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
         {/* Search Header */}
-        <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Search Notes</h2>
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Search Notes</h2>
           
           {/* Search Bar */}
           <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search by keywords, title, or content..."
-              className="w-full pl-10 pr-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white text-lg"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-lg"
             />
           </div>
 
@@ -141,7 +141,7 @@ export default function SearchView() {
             <select
               value={filters.grade}
               onChange={(e) => handleFilterChange('grade', e.target.value)}
-              className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
             >
               {GRADES.map(grade => (
                 <option key={grade} value={grade}>
@@ -153,7 +153,7 @@ export default function SearchView() {
             <select
               value={filters.subject}
               onChange={(e) => handleFilterChange('subject', e.target.value)}
-              className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
             >
               {SUBJECTS.map(subject => (
                 <option key={subject} value={subject}>
@@ -165,7 +165,7 @@ export default function SearchView() {
             <select
               value={filters.unit}
               onChange={(e) => handleFilterChange('unit', e.target.value)}
-              className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-700 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
             >
               {UNITS.map(unit => (
                 <option key={unit} value={unit}>
@@ -178,7 +178,7 @@ export default function SearchView() {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="flex-1 gradient-primary hover:opacity-90 disabled:opacity-50 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md"
+                className="flex-1 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -195,7 +195,7 @@ export default function SearchView() {
               
               <button
                 onClick={clearFilters}
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors"
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                 title="Clear filters"
               >
                 <X className="w-4 h-4" />
@@ -208,32 +208,32 @@ export default function SearchView() {
         <div className="p-6">
           {!hasSearched ? (
             <div className="text-center py-12">
-              <Search className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+              <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Start Searching Your Notes
               </h3>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Enter keywords above and use filters to find specific notes quickly.
               </p>
             </div>
           ) : loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : searchResults.length === 0 ? (
             <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+              <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 No Notes Found
               </h3>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Try adjusting your search terms or filters to find what you're looking for.
               </p>
             </div>
           ) : (
             <div>
               <div className="mb-4">
-                <p className="text-slate-600 dark:text-slate-400">
+                <p className="text-gray-600 dark:text-gray-400">
                   Found {searchResults.length} note{searchResults.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -242,7 +242,7 @@ export default function SearchView() {
                 {searchResults.map(note => (
                   <div
                     key={note.id}
-                    className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                       <div className="flex-1">
@@ -253,16 +253,16 @@ export default function SearchView() {
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSubjectColor(note.subject)}`}>
                             {note.subject}
                           </span>
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                             {note.unit}
                           </span>
                         </div>
                         
-                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                           {highlightText(note.title, searchQuery)}
                         </h3>
                         
-                        <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-400 mb-2">
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {formatDate(note.timestamp)}
@@ -276,7 +276,7 @@ export default function SearchView() {
                         </div>
                         
                         {note.content && (
-                          <p className="text-slate-700 dark:text-slate-300 line-clamp-2">
+                          <p className="text-gray-700 dark:text-gray-300 line-clamp-2">
                             {highlightText(note.content, searchQuery)}
                           </p>
                         )}
