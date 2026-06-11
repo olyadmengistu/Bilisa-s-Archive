@@ -23,11 +23,32 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Load initial notes only when user is authenticated
+    // Set up real-time listener for notes when user is authenticated
+    let unsubscribe;
     if (isAuthenticated) {
-      loadNotes();
-      loadStats();
+      unsubscribe = NoteService.onNotesChange((notes) => {
+        setNotes(notes);
+        setLoading(false);
+        // Update stats when notes change
+        const totalNotes = notes.length;
+        const gradeStats = {};
+        notes.forEach(note => {
+          gradeStats[note.grade] = (gradeStats[note.grade] || 0) + 1;
+        });
+        setStats({ totalNotes, gradeStats });
+      });
+    } else {
+      setNotes([]);
+      setStats({ totalNotes: 0, gradeStats: {} });
+      setLoading(false);
     }
+
+    // Cleanup function to unsubscribe when component unmounts or auth changes
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [isAuthenticated]);
 
   useEffect(() => {
@@ -39,22 +60,6 @@ function App() {
     }
     localStorage.setItem('darkMode', darkMode);
   }, [darkMode]);
-
-  const loadNotes = async () => {
-    setLoading(true);
-    const result = await NoteService.getAllNotes();
-    if (result.success) {
-      setNotes(result.notes);
-    }
-    setLoading(false);
-  };
-
-  const loadStats = async () => {
-    const result = await NoteService.getStats();
-    if (result.success) {
-      setStats(result.stats);
-    }
-  };
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -68,14 +73,11 @@ function App() {
   };
 
   const handleNoteAdded = () => {
-    loadNotes();
-    loadStats();
     setCurrentView('notes');
   };
 
   const handleNoteDeleted = () => {
-    loadNotes();
-    loadStats();
+    // Real-time listener will automatically update notes
   };
 
   const renderContent = () => {
