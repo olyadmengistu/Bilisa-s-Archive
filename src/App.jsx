@@ -4,8 +4,8 @@ import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
 import LoginForm from './components/Auth/LoginForm';
-import { BackendNoteService } from './services/backendNoteService';
-import { useBackendAuth as useAuth } from './auth/BackendAuthProvider';
+import { NoteService } from './db';
+import { useAuth } from './firebase/AuthProvider';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
