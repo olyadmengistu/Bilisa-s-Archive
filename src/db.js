@@ -1,49 +1,71 @@
 import { firestoreService } from './firebase/firestore';
 
-// Fixed user ID for single-user password-based app
-const SINGLE_USER_ID = 'bilisa-archive-user';
-
-// NoteService for single-user password-based app
+// NoteService for Firebase-based app with real user authentication
 export class NoteService {
-  static async addNote(noteData) {
-    console.log('NoteService.addNote called with userId:', SINGLE_USER_ID);
+  static async addNote(userId, noteData) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    console.log('NoteService.addNote called with userId:', userId);
     console.log('NoteService.addNote noteData:', noteData);
-    const result = await firestoreService.addNote(SINGLE_USER_ID, noteData);
+    const result = await firestoreService.addNote(userId, noteData);
     console.log('NoteService.addNote result:', result);
     return result;
   }
 
-  static async getAllNotes() {
-    return await firestoreService.getAllNotes(SINGLE_USER_ID);
+  static async getAllNotes(userId) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    return await firestoreService.getAllNotes(userId);
   }
 
-  static async searchNotes(filters = {}) {
-    return await firestoreService.searchNotes(SINGLE_USER_ID, filters);
+  static async searchNotes(userId, filters = {}) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    return await firestoreService.searchNotes(userId, filters);
   }
 
-  static async getNoteById(id) {
-    return await firestoreService.getNoteById(SINGLE_USER_ID, id);
+  static async getNoteById(userId, id) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    return await firestoreService.getNoteById(userId, id);
   }
 
-  static async deleteNote(id) {
-    return await firestoreService.deleteNote(SINGLE_USER_ID, id);
+  static async deleteNote(userId, id) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    return await firestoreService.deleteNote(userId, id);
   }
 
-  static async updateNote(id, updateData) {
-    return await firestoreService.updateNote(SINGLE_USER_ID, id, updateData);
+  static async updateNote(userId, id, updateData) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    return await firestoreService.updateNote(userId, id, updateData);
   }
 
   static extractKeywords(content) {
     return firestoreService.extractKeywords(content);
   }
 
-  static async getStats() {
-    return await firestoreService.getStats(SINGLE_USER_ID);
+  static async getStats(userId) {
+    if (!userId) {
+      return { success: false, error: 'User not authenticated' };
+    }
+    return await firestoreService.getStats(userId);
   }
 
   // Real-time listener for notes
-  static onNotesChange(callback) {
-    return firestoreService.onNotesChange(SINGLE_USER_ID, callback);
+  static onNotesChange(userId, callback) {
+    if (!userId) {
+      console.error('Cannot set up listener: User not authenticated');
+      return () => {};
+    }
+    return firestoreService.onNotesChange(userId, callback);
   }
 }
 

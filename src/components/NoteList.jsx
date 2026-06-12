@@ -46,7 +46,7 @@ const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-export default function NoteList({ notes, onNoteDeleted, loading }) {
+export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
   const [filteredNotes, setFilteredNotes] = useState(notes);
   const [filters, setFilters] = useState({
     grade: 'all',
@@ -108,7 +108,7 @@ export default function NoteList({ notes, onNoteDeleted, loading }) {
     }
 
     setDeletingId(id);
-    const result = await NoteService.deleteNote(id);
+    const result = await NoteService.deleteNote(userId, id);
     
     if (result.success) {
       onNoteDeleted();

@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import { SimpleAuthProvider } from './auth/SimpleAuthProvider'
+import { AuthProvider } from './firebase/AuthProvider'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <SimpleAuthProvider>
+    <AuthProvider>
       <App />
-    </SimpleAuthProvider>
+    </AuthProvider>
   </React.StrictMode>,
 )

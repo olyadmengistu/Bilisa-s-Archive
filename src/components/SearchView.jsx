@@ -6,7 +6,7 @@ const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-export default function SearchView() {
+export default function SearchView({ userId }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     grade: 'all',
@@ -27,7 +27,7 @@ export default function SearchView() {
       keywords: searchQuery
     };
     
-    const result = await NoteService.searchNotes(searchFilters);
+    const result = await NoteService.searchNotes(userId, searchFilters);
     
     if (result.success) {
       setSearchResults(result.notes);

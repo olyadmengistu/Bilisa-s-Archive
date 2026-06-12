@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
 import { Mail, Lock, LogIn, Chrome } from 'lucide-react';
-import { useSimpleAuth } from '../../auth/SimpleAuthProvider';
+import { useAuth } from '../../firebase/AuthProvider';
 
-const LoginForm = ({ onToggleMode }) => {
+const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { signIn } = useSimpleAuth();
+  const { signIn, signInWithGoogle } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // SimpleAuthProvider only accepts password, not email
-    const result = await signIn(password);
+    const result = await signIn(email, password);
     
     if (!result.success) {
       setError(result.error);
@@ -26,7 +25,16 @@ const LoginForm = ({ onToggleMode }) => {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('Google sign-in is not available. Please use the password instead.');
+    setError('');
+    setLoading(true);
+
+    const result = await signInWithGoogle();
+    
+    if (!result.success) {
+      setError(result.error);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -132,16 +140,6 @@ const LoginForm = ({ onToggleMode }) => {
             Sign in with Google
           </button>
         </div>
-
-        <p className="mt-8 text-center text-gray-600 dark:text-gray-400">
-          Don't have an account?{' '}
-          <button
-            onClick={onToggleMode}
-            className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
-          >
-            Sign up
-          </button>
-        </p>
       </div>
       </div>
     </div>

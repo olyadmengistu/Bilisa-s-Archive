@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Save, Upload, FileText, X, AlertCircle, Eye } from 'lucide-react';
 import { NoteService } from '../db';
-import { testFirebaseConnectivity } from '../firebase/firestore';
 
 const GRADES = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`);
 
-export default function NoteForm({ onNoteAdded }) {
+export default function NoteForm({ onNoteAdded, userId }) {
   const [formData, setFormData] = useState({
     title: '',
     grade: '',
@@ -86,17 +85,6 @@ export default function NoteForm({ onNoteAdded }) {
     setLoading(true);
 
     try {
-      console.log('Starting note save process...');
-      
-      // Test Firebase connectivity first
-      console.log('Testing Firebase connectivity...');
-      const connectivityTest = await testFirebaseConnectivity();
-      console.log('Firebase connectivity test result:', connectivityTest);
-      
-      if (!connectivityTest.success) {
-        throw new Error(`Firebase connection failed: ${connectivityTest.error}. Please check your internet connection and Firebase configuration.`);
-      }
-      
       // Validation
       if (!formData.title.trim()) {
         throw new Error('Please enter a title for your note.');
@@ -116,9 +104,7 @@ export default function NoteForm({ onNoteAdded }) {
 
       let pdfData = null;
       if (formData.pdfFile) {
-        console.log('Reading PDF file...');
         pdfData = await readPdfAsBase64(formData.pdfFile);
-        console.log('PDF file read successfully');
       }
 
       const noteData = {
@@ -130,20 +116,16 @@ export default function NoteForm({ onNoteAdded }) {
         pdfData: pdfData,
         pdfName: formData.pdfFile ? formData.pdfFile.name : null
       };
-
-      console.log('Calling NoteService.addNote with data:', noteData);
       
-      // Add timeout to prevent endless loading
+      // Add timeout to prevent endless loading (10 seconds)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Save operation timed out after 30 seconds')), 30000);
+        setTimeout(() => reject(new Error('Save operation timed out after 10 seconds')), 10000);
       });
       
       const result = await Promise.race([
-        NoteService.addNote(noteData),
+        NoteService.addNote(userId, noteData),
         timeoutPromise
       ]);
-      
-      console.log('NoteService.addNote returned:', result);
 
       if (result.success) {
         setSuccess('Note saved successfully!');
@@ -156,9 +138,8 @@ export default function NoteForm({ onNoteAdded }) {
           pdfFile: null
         });
         
-        setTimeout(() => {
-          onNoteAdded();
-        }, 1500);
+        // Real-time listener will automatically update notes, no need for callback
+        onNoteAdded();
       } else {
         throw new Error(result.error);
       }
@@ -166,7 +147,6 @@ export default function NoteForm({ onNoteAdded }) {
       console.error('Error saving note:', err);
       setError(err.message);
     } finally {
-      console.log('Setting loading to false');
       setLoading(false);
     }
   };

@@ -3,9 +3,9 @@ import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, B
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
-import PasswordForm from './components/Auth/PasswordForm';
+import LoginForm from './components/Auth/LoginForm';
 import { NoteService } from './db';
-import { useSimpleAuth } from './auth/SimpleAuthProvider';
+import { useAuth } from './firebase/AuthProvider';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -14,7 +14,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalNotes: 0, gradeStats: {} });
   
-  const { isAuthenticated, loading: authLoading, signOut } = useSimpleAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
+  const isAuthenticated = !!user;
 
   useEffect(() => {
     // Check for saved dark mode preference
@@ -25,8 +26,8 @@ function App() {
   useEffect(() => {
     // Set up real-time listener for notes when user is authenticated
     let unsubscribe;
-    if (isAuthenticated) {
-      unsubscribe = NoteService.onNotesChange((notes) => {
+    if (user) {
+      unsubscribe = NoteService.onNotesChange(user.uid, (notes) => {
         setNotes(notes);
         setLoading(false);
         // Update stats when notes change
@@ -49,7 +50,7 @@ function App() {
         unsubscribe();
       }
     };
-  }, [isAuthenticated]);
+  }, [user]);
 
   useEffect(() => {
     // Apply dark mode class to document
@@ -83,7 +84,7 @@ function App() {
   const renderContent = () => {
     // Show authentication screen if user is not authenticated
     if (!isAuthenticated) {
-      return <PasswordForm />;
+      return <LoginForm />;
     }
 
     switch (currentView) {
@@ -180,13 +181,13 @@ function App() {
         );
 
       case 'add':
-        return <NoteForm onNoteAdded={handleNoteAdded} />;
+        return <NoteForm onNoteAdded={handleNoteAdded} userId={user?.uid} />;
 
       case 'notes':
-        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} />;
+        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} userId={user?.uid} />;
 
       case 'search':
-        return <SearchView />;
+        return <SearchView userId={user?.uid} />;
 
       default:
         return null;
