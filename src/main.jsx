@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
-import { AuthProvider } from './firebase/AuthProvider'
+import { BackendAuthProvider } from './auth/BackendAuthProvider'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
+    <BackendAuthProvider>
       <App />
-    </AuthProvider>
+    </BackendAuthProvider>
   </React.StrictMode>,
 )
