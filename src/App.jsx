@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award, LogOut } from 'lucide-react';
+import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award } from 'lucide-react';
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
 import LoginForm from './components/Auth/LoginForm';
+import SideBar from './components/SideBar';
 import { NoteService } from './db';
 import { useAuth } from './firebase/AuthProvider';
 
@@ -196,149 +197,19 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-      {/* Header */}
+      {/* Side Bar */}
       {isAuthenticated && (
-        <header className="glass shadow-lg border-b border-gray-200 dark:border-gray-700 animate-fadeInDown">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            <div className="flex items-center gap-3 sm:gap-6">
-              <div className="flex items-center gap-2">
-                <div className="feature-icon gradient-primary" style={{width: '28px', height: '28px', fontSize: '12px'}}>
-                  <Brain className="w-4 h-4" />
-                </div>
-                <h1 className="text-base sm:text-lg lg:text-xl font-bold logo-bilisa">Bilisa Archive</h1>
-                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500 animate-pulse" />
-              </div>
-              <nav className="hidden md:flex gap-1 sm:gap-2">
-                <button
-                  onClick={() => setCurrentView('home')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
-                    currentView === 'home'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Home className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-                  Home
-                </button>
-                <button
-                  onClick={() => setCurrentView('add')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
-                    currentView === 'add'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Plus className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-                  Add Note
-                </button>
-                <button
-                  onClick={() => setCurrentView('notes')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
-                    currentView === 'notes'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Archive className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-                  My Notes
-                </button>
-                <button
-                  onClick={() => setCurrentView('search')}
-                  className={`px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 hover-lift ${
-                    currentView === 'search'
-                      ? 'gradient-primary text-white shadow-lg'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Search className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-                  Search
-                </button>
-              </nav>
-            </div>
-            
-            <div className="flex items-center gap-1 sm:gap-2">
-              {isAuthenticated && (
-                <button
-                  onClick={handleSignOut}
-                  className="feature-icon hover-lift animate-pulse-slow p-1 sm:p-2"
-                  aria-label="Sign out"
-                  title="Sign out"
-                >
-                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-              )}
-              <button
-                onClick={toggleDarkMode}
-                className="feature-icon hover-lift animate-pulse-slow p-1 sm:p-2"
-                aria-label="Toggle dark mode"
-              >
-                {darkMode ? (
-                  <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
-                  <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-      )}
-
-      {/* Mobile Navigation */}
-      {isAuthenticated && (
-        <div className="md:hidden glass border-b border-gray-200 dark:border-gray-700 animate-fadeInDown">
-        <div className="flex justify-around py-2 sm:py-3">
-          <button
-            onClick={() => setCurrentView('home')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
-              currentView === 'home'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            <Home className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-            Home
-          </button>
-          <button
-            onClick={() => setCurrentView('add')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
-              currentView === 'add'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-            Add
-          </button>
-          <button
-            onClick={() => setCurrentView('notes')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
-              currentView === 'notes'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            <Archive className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-            Notes
-          </button>
-          <button
-            onClick={() => setCurrentView('search')}
-            className={`flex flex-col items-center p-2 sm:p-3 rounded-xl text-xs transition-all duration-300 hover-lift ${
-              currentView === 'search'
-                ? 'gradient-primary text-white shadow-lg'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            <Search className="w-4 h-4 sm:w-5 sm:h-5 mb-1" />
-            Search
-          </button>
-        </div>
-      </div>
+        <SideBar
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+          handleSignOut={handleSignOut}
+        />
       )}
 
       {/* Main Content */}
-      <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <main className={`px-4 sm:px-6 lg:px-8 py-4 sm:py-6 ${isAuthenticated ? 'ml-64' : ''}`}>
         {renderContent()}
       </main>
     </div>
