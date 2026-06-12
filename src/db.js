@@ -1,71 +1,79 @@
-import { firestoreService } from './firebase/firestore';
+import { notesAPI } from './lib/api';
 
-// NoteService for Firebase-based app with real user authentication
+// NoteService for API-based app with permanent storage
 export class NoteService {
-  static async addNote(userId, noteData) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    console.log('NoteService.addNote called with userId:', userId);
-    console.log('NoteService.addNote noteData:', noteData);
-    const result = await firestoreService.addNote(userId, noteData);
-    console.log('NoteService.addNote result:', result);
+  static async addNote(noteData) {
+    // Add keywords to note data
+    const noteWithKeywords = {
+      ...noteData,
+      keywords: this.extractKeywords(noteData.content || '')
+    };
+    
+    const result = await notesAPI.createNote(noteWithKeywords);
     return result;
   }
 
-  static async getAllNotes(userId) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    return await firestoreService.getAllNotes(userId);
+  static async getAllNotes() {
+    return await notesAPI.getAllNotes();
   }
 
-  static async searchNotes(userId, filters = {}) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    return await firestoreService.searchNotes(userId, filters);
+  static async searchNotes(filters = {}) {
+    return await notesAPI.searchNotes(filters);
   }
 
-  static async getNoteById(userId, id) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    return await firestoreService.getNoteById(userId, id);
+  static async getNoteById(id) {
+    return await notesAPI.getNoteById(id);
   }
 
-  static async deleteNote(userId, id) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    return await firestoreService.deleteNote(userId, id);
+  static async deleteNote(id) {
+    return await notesAPI.deleteNote(id);
   }
 
-  static async updateNote(userId, id, updateData) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    return await firestoreService.updateNote(userId, id, updateData);
+  static async updateNote(id, updateData) {
+    const updateWithKeywords = {
+      ...updateData,
+      keywords: this.extractKeywords(updateData.content || '')
+    };
+    
+    return await notesAPI.updateNote(id, updateWithKeywords);
   }
 
   static extractKeywords(content) {
-    return firestoreService.extractKeywords(content);
+    if (!content) return [];
+    
+    const words = content
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(word => word.length > 3)
+      .filter(word => !['this', 'that', 'with', 'from', 'they', 'have', 'been', 'said', 'each', 'which', 'their', 'time', 'will', 'about', 'would', 'there', 'could'].includes(word));
+    
+    return [...new Set(words)].slice(0, 20);
   }
 
-  static async getStats(userId) {
-    if (!userId) {
-      return { success: false, error: 'User not authenticated' };
-    }
-    return await firestoreService.getStats(userId);
+  static async getStats() {
+    return await notesAPI.getStats();
   }
 
-  // Real-time listener for notes
-  static onNotesChange(userId, callback) {
-    if (!userId) {
-      console.error('Cannot set up listener: User not authenticated');
-      return () => {};
-    }
-    return firestoreService.onNotesChange(userId, callback);
+  // Polling-based listener for notes (since we don't have real-time with API)
+  static onNotesChange(callback) {
+    // Initial fetch
+    notesAPI.getAllNotes().then(result => {
+      if (result.success) {
+        callback(result.notes);
+      }
+    });
+    
+    // Set up polling every 5 seconds
+    const intervalId = setInterval(async () => {
+      const result = await notesAPI.getAllNotes();
+      if (result.success) {
+        callback(result.notes);
+      }
+    }, 5000);
+    
+    // Return cleanup function
+    return () => clearInterval(intervalId);
   }
 }
 

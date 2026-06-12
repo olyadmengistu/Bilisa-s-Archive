@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User, UserPlus, Chrome } from 'lucide-react';
-import { useSimpleAuth } from '../../auth/SimpleAuthProvider';
+import { Mail, Lock, User, UserPlus } from 'lucide-react';
+import { useAuth } from '../../auth/AuthProvider';
 
 const SignupForm = ({ onToggleMode }) => {
   const [displayName, setDisplayName] = useState('');
@@ -10,7 +10,7 @@ const SignupForm = ({ onToggleMode }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { signIn } = useSimpleAuth();
+  const { signUp } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +43,6 @@ const SignupForm = ({ onToggleMode }) => {
       <video
         autoPlay
         loop
-        muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
@@ -156,26 +155,6 @@ const SignupForm = ({ onToggleMode }) => {
             )}
           </button>
         </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-            className="mt-4 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Chrome className="w-5 h-5" />
-            Sign up with Google
-          </button>
-        </div>
 
         <p className="mt-8 text-center text-gray-600 dark:text-gray-400">
           Already have an account?{' '}

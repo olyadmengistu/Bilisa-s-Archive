@@ -6,7 +6,7 @@ const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-export default function SearchView({ userId }) {
+export default function SearchView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     grade: 'all',
@@ -27,7 +27,7 @@ export default function SearchView({ userId }) {
       keywords: searchQuery
     };
     
-    const result = await NoteService.searchNotes(userId, searchFilters);
+    const result = await NoteService.searchNotes(searchFilters);
     
     if (result.success) {
       setSearchResults(result.notes);
@@ -117,14 +117,14 @@ export default function SearchView({ userId }) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
         {/* Search Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Search Notes</h2>
+        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Search Notes</h2>
           
           {/* Search Bar */}
-          <div className="relative mb-6">
+          <div className="relative mb-4 sm:mb-6">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -132,16 +132,16 @@ export default function SearchView({ userId }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Search by keywords, title, or content..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-lg"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-base sm:text-lg"
             />
           </div>
 
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <select
               value={filters.grade}
               onChange={(e) => handleFilterChange('grade', e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+              className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
             >
               {GRADES.map(grade => (
                 <option key={grade} value={grade}>
@@ -153,7 +153,7 @@ export default function SearchView({ userId }) {
             <select
               value={filters.subject}
               onChange={(e) => handleFilterChange('subject', e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+              className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
             >
               {SUBJECTS.map(subject => (
                 <option key={subject} value={subject}>
@@ -165,7 +165,7 @@ export default function SearchView({ userId }) {
             <select
               value={filters.unit}
               onChange={(e) => handleFilterChange('unit', e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+              className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
             >
               {UNITS.map(unit => (
                 <option key={unit} value={unit}>
@@ -178,7 +178,7 @@ export default function SearchView({ userId }) {
               <button
                 onClick={handleSearch}
                 disabled={loading}
-                className="flex-1 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 {loading ? (
                   <>
@@ -205,35 +205,35 @@ export default function SearchView({ userId }) {
         </div>
 
         {/* Search Results */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {!hasSearched ? (
-            <div className="text-center py-12">
-              <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <div className="text-center py-8 sm:py-12">
+              <Search className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
                 Start Searching Your Notes
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 Enter keywords above and use filters to find specific notes quickly.
               </p>
             </div>
           ) : loading ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center py-8 sm:py-12">
               <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : searchResults.length === 0 ? (
-            <div className="text-center py-12">
-              <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <div className="text-center py-8 sm:py-12">
+              <BookOpen className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
                 No Notes Found
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 Try adjusting your search terms or filters to find what you're looking for.
               </p>
             </div>
           ) : (
             <div>
               <div className="mb-4">
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   Found {searchResults.length} note{searchResults.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -258,11 +258,11 @@ export default function SearchView({ userId }) {
                           </span>
                         </div>
                         
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
                           {highlightText(note.title, searchQuery)}
                         </h3>
                         
-                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {formatDate(note.timestamp)}
@@ -276,7 +276,7 @@ export default function SearchView({ userId }) {
                         </div>
                         
                         {note.content && (
-                          <p className="text-gray-700 dark:text-gray-300 line-clamp-2">
+                          <p className="text-gray-700 dark:text-gray-300 line-clamp-2 text-sm">
                             {highlightText(note.content, searchQuery)}
                           </p>
                         )}
@@ -330,12 +330,12 @@ export default function SearchView({ userId }) {
 
       {/* Note Detail Modal */}
       {selectedNote && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-4xl max-h-[90vh] overflow-hidden w-full">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 truncate">
                     {highlightText(selectedNote.title, searchQuery)}
                   </h3>
                   <div className="flex flex-wrap items-center gap-2">
@@ -352,33 +352,33 @@ export default function SearchView({ userId }) {
                 </div>
                 <button
                   onClick={() => setSelectedNote(null)}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 flex-shrink-0"
                 >
-                  ×
+                  <X className="w-6 h-6" />
                 </button>
               </div>
             </div>
             
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[60vh]">
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-4">
                 Created: {formatDate(selectedNote.timestamp)}
               </div>
               
               {selectedNote.content ? (
                 <div className="prose dark:prose-invert max-w-none">
-                  <pre className="whitespace-pre-wrap font-sans text-gray-700 dark:text-gray-300">
+                  <pre className="whitespace-pre-wrap font-sans text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                     {highlightText(selectedNote.content, searchQuery)}
                   </pre>
                 </div>
               ) : selectedNote.pdfData ? (
                 <div className="text-center py-8">
-                  <FileText className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  <FileText className="w-12 h-12 sm:w-16 sm:h-16 text-red-500 mx-auto mb-4" />
+                  <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-4">
                     This note contains a PDF file: {selectedNote.pdfName}
                   </p>
                   <button
                     onClick={() => downloadPdf(selectedNote)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto"
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 mx-auto text-sm"
                   >
                     <Download className="w-4 h-4" />
                     Download PDF

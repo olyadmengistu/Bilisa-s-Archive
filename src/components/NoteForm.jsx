@@ -6,7 +6,7 @@ const GRADES = ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`);
 
-export default function NoteForm({ onNoteAdded, userId }) {
+export default function NoteForm({ onNoteAdded }) {
   const [formData, setFormData] = useState({
     title: '',
     grade: '',
@@ -123,7 +123,7 @@ export default function NoteForm({ onNoteAdded, userId }) {
       });
       
       const result = await Promise.race([
-        NoteService.addNote(userId, noteData),
+        NoteService.addNote(noteData),
         timeoutPromise
       ]);
 
@@ -152,16 +152,16 @@ export default function NoteForm({ onNoteAdded, userId }) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-4 sm:p-6">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Add New Note</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Add New Note</h2>
+          <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
             Organize your study materials by grade, subject, and unit
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -179,7 +179,7 @@ export default function NoteForm({ onNoteAdded, userId }) {
           </div>
 
           {/* Grade, Subject, Unit */}
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Grade *
@@ -188,7 +188,7 @@ export default function NoteForm({ onNoteAdded, userId }) {
                 name="grade"
                 value={formData.grade}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
                 required
               >
                 <option value="">Select Grade</option>
@@ -206,7 +206,7 @@ export default function NoteForm({ onNoteAdded, userId }) {
                 name="subject"
                 value={formData.subject}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
                 required
               >
                 <option value="">Select Subject</option>
@@ -224,7 +224,7 @@ export default function NoteForm({ onNoteAdded, userId }) {
                 name="unit"
                 value={formData.unit}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
                 required
               >
                 <option value="">Select Unit</option>
@@ -240,11 +240,11 @@ export default function NoteForm({ onNoteAdded, userId }) {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Content Type
             </label>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, pdfFile: null }))}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-colors ${
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border-2 transition-colors ${
                   !formData.pdfFile
                     ? 'border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
                     : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400'
@@ -254,7 +254,7 @@ export default function NoteForm({ onNoteAdded, userId }) {
                 Text Note
               </button>
               
-              <label className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-colors ${
+              <label className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-colors ${
                 formData.pdfFile
                   ? 'border-primary-500 bg-primary-50 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
                   : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400'
@@ -295,11 +295,11 @@ export default function NoteForm({ onNoteAdded, userId }) {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 PDF File
               </label>
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center gap-3">
-                  <FileText className="w-8 h-8 text-red-500" />
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{formData.pdfFile.name}</p>
+                  <FileText className="w-8 h-8 text-red-500 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-gray-900 dark:text-white truncate">{formData.pdfFile.name}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       {(formData.pdfFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>

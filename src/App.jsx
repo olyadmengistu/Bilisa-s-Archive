@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award } from 'lucide-react';
+import { Search, Plus, Moon, Sun, BookOpen, Home, Archive, Settings, Sparkles, Brain, Target, Zap, Award, Menu } from 'lucide-react';
 import NoteForm from './components/NoteForm';
 import NoteList from './components/NoteList';
 import SearchView from './components/SearchView';
-import LoginForm from './components/Auth/LoginForm';
 import SideBar from './components/SideBar';
+import SettingsComponent from './components/Settings';
 import { NoteService } from './db';
-import { useAuth } from './firebase/AuthProvider';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -14,9 +13,8 @@ function App() {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ totalNotes: 0, gradeStats: {} });
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  const { user, loading: authLoading, signOut } = useAuth();
-  const isAuthenticated = !!user;
 
   useEffect(() => {
     // Check for saved dark mode preference
@@ -25,33 +23,21 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Set up real-time listener for notes when user is authenticated
-    let unsubscribe;
-    if (user) {
-      unsubscribe = NoteService.onNotesChange(user.uid, (notes) => {
-        setNotes(notes);
-        setLoading(false);
-        // Update stats when notes change
-        const totalNotes = notes.length;
-        const gradeStats = {};
-        notes.forEach(note => {
-          gradeStats[note.grade] = (gradeStats[note.grade] || 0) + 1;
-        });
-        setStats({ totalNotes, gradeStats });
-      });
-    } else {
-      setNotes([]);
-      setStats({ totalNotes: 0, gradeStats: {} });
+    // Load all notes on mount
+    const loadNotes = async () => {
+      const allNotes = await NoteService.getAllNotes();
+      setNotes(allNotes);
       setLoading(false);
-    }
-
-    // Cleanup function to unsubscribe when component unmounts or auth changes
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
+      // Update stats
+      const totalNotes = allNotes.length;
+      const gradeStats = {};
+      allNotes.forEach(note => {
+        gradeStats[note.grade] = (gradeStats[note.grade] || 0) + 1;
+      });
+      setStats({ totalNotes, gradeStats });
     };
-  }, [user]);
+    loadNotes();
+  }, []);
 
   useEffect(() => {
     // Apply dark mode class to document
@@ -67,31 +53,33 @@ function App() {
     setDarkMode(!darkMode);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    setCurrentView('home');
-    setNotes([]);
-    setStats({ totalNotes: 0, gradeStats: {} });
-  };
-
   const handleNoteAdded = () => {
     setCurrentView('notes');
   };
+
 
   const handleNoteDeleted = () => {
     // Real-time listener will automatically update notes
   };
 
   const renderContent = () => {
-    // Show authentication screen if user is not authenticated
-    if (!isAuthenticated) {
-      return <LoginForm />;
-    }
-
     switch (currentView) {
       case 'home':
         return (
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+          <div className="relative min-h-screen">
+            {/* Background Video */}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src="/videos/v2_watermarked-c61d724a-368d-4f77-bc38-7ab06ebfda59.mp4" type="video/mp4" />
+            </video>
+            
+            {/* Content */}
+            <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
             <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-fadeInDown">
               <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <div className="feature-icon gradient-primary animate-float">
@@ -178,17 +166,21 @@ function App() {
                 <Target className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
               </button>
             </div>
+            </div>
           </div>
         );
 
       case 'add':
-        return <NoteForm onNoteAdded={handleNoteAdded} userId={user?.uid} />;
+        return <NoteForm onNoteAdded={handleNoteAdded} />;
 
       case 'notes':
-        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} userId={user?.uid} />;
+        return <NoteList notes={notes} onNoteDeleted={handleNoteDeleted} loading={loading} />;
 
       case 'search':
-        return <SearchView userId={user?.uid} />;
+        return <SearchView />;
+
+      case 'settings':
+        return <SettingsComponent darkMode={darkMode} toggleDarkMode={toggleDarkMode} />;
 
       default:
         return null;
@@ -198,18 +190,28 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Side Bar */}
-      {isAuthenticated && (
-        <SideBar
-          currentView={currentView}
-          setCurrentView={setCurrentView}
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
-          handleSignOut={handleSignOut}
-        />
-      )}
+      <SideBar
+        currentView={currentView}
+        setCurrentView={setCurrentView}
+        darkMode={darkMode}
+        toggleDarkMode={toggleDarkMode}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* Main Content */}
-      <main className={`px-4 sm:px-6 lg:px-8 py-4 sm:py-6 ${isAuthenticated ? 'ml-64' : ''}`}>
+      <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 transition-all duration-300 lg:ml-64">
+        {/* Mobile Header with Hamburger Menu */}
+        <div className="lg:hidden flex items-center justify-between mb-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-lg bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <h1 className="text-lg font-bold logo-bilisa">Bilisa Archive</h1>
+          <div className="w-10" /> {/* Spacer for balance */}
+        </div>
         {renderContent()}
       </main>
     </div>

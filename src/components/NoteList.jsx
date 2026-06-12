@@ -46,7 +46,7 @@ const GRADES = ['all', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
 const SUBJECTS = ['all', 'Chemistry', 'Physics', 'Biology', 'Mathematics', 'English'];
 const UNITS = ['all', ...Array.from({ length: 11 }, (_, i) => `Unit ${i + 1}`)];
 
-export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
+export default function NoteList({ notes, onNoteDeleted, loading }) {
   const [filteredNotes, setFilteredNotes] = useState(notes);
   const [filters, setFilters] = useState({
     grade: 'all',
@@ -108,7 +108,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
     }
 
     setDeletingId(id);
-    const result = await NoteService.deleteNote(userId, id);
+    const result = await NoteService.deleteNote(id);
     
     if (result.success) {
       onNoteDeleted();
@@ -170,14 +170,14 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Notes</h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">My Notes</h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">
                 {filteredNotes.length} of {notes.length} notes
               </p>
             </div>
@@ -185,7 +185,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors text-sm"
               >
                 <Filter className="w-4 h-4" />
                 Filters
@@ -195,7 +195,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
               {(filters.grade !== 'all' || filters.subject !== 'all' || filters.unit !== 'all' || filters.search) && (
                 <button
                   onClick={clearFilters}
-                  className="px-4 py-2 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 rounded-lg transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-800 rounded-lg transition-colors text-sm"
                 >
                   Clear
                 </button>
@@ -212,7 +212,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search notes by title, content, or keywords..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
               />
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
               <select
                 value={filters.grade}
                 onChange={(e) => handleFilterChange('grade', e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 {GRADES.map(grade => (
                   <option key={grade} value={grade}>
@@ -235,7 +235,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
               <select
                 value={filters.subject}
                 onChange={(e) => handleFilterChange('subject', e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 {SUBJECTS.map(subject => (
                   <option key={subject} value={subject}>
@@ -247,7 +247,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
               <select
                 value={filters.unit}
                 onChange={(e) => handleFilterChange('unit', e.target.value)}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+                className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
               >
                 {UNITS.map(unit => (
                   <option key={unit} value={unit}>
@@ -262,12 +262,12 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
         {/* Notes List */}
         <div className="divide-y divide-gray-200 dark:divide-gray-700">
           {filteredNotes.length === 0 ? (
-            <div className="p-12 text-center">
-              <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <div className="p-8 sm:p-12 text-center">
+              <BookOpen className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">
                 {notes.length === 0 ? 'No notes yet' : 'No notes match your filters'}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 {notes.length === 0 
                   ? 'Start adding your first study note to build your archive.'
                   : 'Try adjusting your filters or search terms.'
@@ -276,7 +276,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
             </div>
           ) : (
             filteredNotes.map(note => (
-              <div key={note.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <div key={note.id} className="p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -291,11 +291,11 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
                       </span>
                     </div>
                     
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       {note.title}
                     </h3>
                     
-                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
                         {formatDate(note.timestamp)}
@@ -309,7 +309,7 @@ export default function NoteList({ notes, onNoteDeleted, loading, userId }) {
                     </div>
                     
                     {note.content && (
-                      <div className="text-gray-700 dark:text-gray-300 line-clamp-3">
+                      <div className="text-gray-700 dark:text-gray-300 line-clamp-3 text-sm">
                         <MathRenderer text={note.content} />
                       </div>
                     )}

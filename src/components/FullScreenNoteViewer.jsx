@@ -153,8 +153,24 @@ export default function FullScreenNoteViewer({ note, onClose }) {
       return () => clearTimeout(timer);
     }
   }, [autoHideControls, showControls]);
+
+  // Auto-save settings when they change
+  useEffect(() => {
+    const settings = {
+      brightness, blueFilterIntensity, contrast, backgroundColor, textColor,
+      fontFamily, fontSizeDropdown, lineSpacing, letterSpacing, wordSpacing,
+      maxColumnWidth, margins, readingRuler, focusMode, autoHideControls,
+      invertColors, grayscale, textStyle, eyeProtectionMode, fontSize, lineHeight
+    };
+    localStorage.setItem('noteViewerSettings', JSON.stringify(settings));
+  }, [
+    brightness, blueFilterIntensity, contrast, backgroundColor, textColor,
+    fontFamily, fontSizeDropdown, lineSpacing, letterSpacing, wordSpacing,
+    maxColumnWidth, margins, readingRuler, focusMode, autoHideControls,
+    invertColors, grayscale, textStyle, eyeProtectionMode, fontSize, lineHeight
+  ]);
   
-  // Save settings to localStorage
+  // Manual save settings (for user-triggered save)
   const saveSettings = () => {
     const settings = {
       brightness, blueFilterIntensity, contrast, backgroundColor, textColor,
@@ -163,24 +179,40 @@ export default function FullScreenNoteViewer({ note, onClose }) {
       invertColors, grayscale, textStyle, eyeProtectionMode, fontSize, lineHeight
     };
     localStorage.setItem('noteViewerSettings', JSON.stringify(settings));
+    // Show save confirmation
+    alert('Settings saved successfully!');
   };
   
   // Load settings from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('noteViewerSettings');
     if (saved) {
-      const settings = JSON.parse(saved);
-      Object.keys(settings).forEach(key => {
-        if (key.includes('Color') || key === 'backgroundColor' || key === 'textColor') {
-          // Handle color settings
-        } else if (typeof settings[key] === 'boolean') {
-          // Handle boolean settings
-        } else if (typeof settings[key] === 'number') {
-          // Handle number settings
-        } else {
-          // Handle string settings
-        }
-      });
+      try {
+        const settings = JSON.parse(saved);
+        if (settings.brightness !== undefined) setBrightness(settings.brightness);
+        if (settings.blueFilterIntensity !== undefined) setBlueFilterIntensity(settings.blueFilterIntensity);
+        if (settings.contrast !== undefined) setContrast(settings.contrast);
+        if (settings.backgroundColor !== undefined) setBackgroundColor(settings.backgroundColor);
+        if (settings.textColor !== undefined) setTextColor(settings.textColor);
+        if (settings.fontFamily !== undefined) setFontFamily(settings.fontFamily);
+        if (settings.fontSizeDropdown !== undefined) setFontSizeDropdown(settings.fontSizeDropdown);
+        if (settings.lineSpacing !== undefined) setLineSpacing(settings.lineSpacing);
+        if (settings.letterSpacing !== undefined) setLetterSpacing(settings.letterSpacing);
+        if (settings.wordSpacing !== undefined) setWordSpacing(settings.wordSpacing);
+        if (settings.maxColumnWidth !== undefined) setMaxColumnWidth(settings.maxColumnWidth);
+        if (settings.margins !== undefined) setMargins(settings.margins);
+        if (settings.readingRuler !== undefined) setReadingRuler(settings.readingRuler);
+        if (settings.focusMode !== undefined) setFocusMode(settings.focusMode);
+        if (settings.autoHideControls !== undefined) setAutoHideControls(settings.autoHideControls);
+        if (settings.invertColors !== undefined) setInvertColors(settings.invertColors);
+        if (settings.grayscale !== undefined) setGrayscale(settings.grayscale);
+        if (settings.textStyle !== undefined) setTextStyle(settings.textStyle);
+        if (settings.eyeProtectionMode !== undefined) setEyeProtectionMode(settings.eyeProtectionMode);
+        if (settings.fontSize !== undefined) setFontSize(settings.fontSize);
+        if (settings.lineHeight !== undefined) setLineHeight(settings.lineHeight);
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
     }
   }, []);
   
@@ -490,12 +522,10 @@ export default function FullScreenNoteViewer({ note, onClose }) {
   return (
     <div 
       ref={viewerRef}
-      className={`fixed inset-0 z-50 transition-all duration-300 ${
-        isFullscreen ? 'bg-black' : 'bg-gray-900'
-      }`}
+      className="fixed inset-0 z-50 transition-all duration-300"
       style={{
-        background: getCurrentEyeProtection().background,
-        filter: getCurrentEyeProtection().filter
+        backgroundColor: backgroundColor,
+        filter: `brightness(${brightness}%) contrast(${contrast}%) sepia(${blueFilterIntensity / 100}%) ${invertColors ? 'invert(1)' : ''} ${grayscale ? 'grayscale(1)' : ''}`
       }}
     >
       {/* Controls Header */}
@@ -505,65 +535,65 @@ export default function FullScreenNoteViewer({ note, onClose }) {
         }`}
       >
         <div className="bg-black bg-opacity-50 backdrop-blur-md border-b border-gray-700">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-white text-xl font-semibold truncate max-w-md">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <h1 className="text-white text-base sm:text-xl font-semibold truncate max-w-[200px] sm:max-w-md">
                 {note.title}
               </h1>
-              <div className="flex items-center gap-2 text-white text-sm">
-                <span className="px-2 py-1 bg-blue-600 rounded-full text-xs">
+              <div className="flex items-center gap-1 sm:gap-2 text-white text-xs sm:text-sm flex-shrink-0">
+                <span className="px-1.5 sm:px-2 py-1 bg-blue-600 rounded-full text-xs">
                   {note.grade}
                 </span>
-                <span className="px-2 py-1 bg-green-600 rounded-full text-xs">
+                <span className="px-1.5 sm:px-2 py-1 bg-green-600 rounded-full text-xs">
                   {note.subject}
                 </span>
-                <span className="px-2 py-1 bg-purple-600 rounded-full text-xs">
+                <span className="px-1.5 sm:px-2 py-1 bg-purple-600 rounded-full text-xs">
                   {note.unit}
                 </span>
               </div>
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 title="Settings"
               >
-                <Settings className="w-5 h-5" />
+                <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               
               {note.content && (
                 <button
                   onClick={downloadNoteAsPdf}
-                  className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                  className="p-1.5 sm:p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                   title="Download as PDF"
                 >
-                  <FileText className="w-5 h-5" />
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               )}
               
               <button
                 onClick={downloadNote}
-                className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 title="Download note"
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               
               <button
                 onClick={toggleFullscreen}
-                className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen (F)"}
               >
-                {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                {isFullscreen ? <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
               
               <button
                 onClick={onClose}
-                className="p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
                 title="Close (Esc)"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -572,9 +602,9 @@ export default function FullScreenNoteViewer({ note, onClose }) {
 
       {/* Comprehensive Settings Panel */}
       {showSettings && (
-        <div className="absolute top-20 right-4 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-96 max-h-[80vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Eye Comfort Settings</h3>
+        <div className="absolute top-16 sm:top-20 right-2 sm:right-4 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-4 sm:p-6 w-[calc(100%-1rem)] sm:w-96 max-h-[80vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Eye Comfort Settings</h3>
             <button
               onClick={saveSettings}
               className="p-2 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900 rounded-lg transition-colors"
@@ -585,8 +615,8 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Brightness */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Brightness: {brightness}%
             </label>
             <input
@@ -594,14 +624,16 @@ export default function FullScreenNoteViewer({ note, onClose }) {
               min="0"
               max="150"
               value={brightness}
-              onChange={(e) => setBrightness(parseInt(e.target.value))}
+              onChange={(e) => {
+                setBrightness(parseInt(e.target.value));
+              }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
           
           {/* Blue Filter Intensity */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Blue filter intensity: {blueFilterIntensity}%
             </label>
             <input
@@ -609,14 +641,16 @@ export default function FullScreenNoteViewer({ note, onClose }) {
               min="0"
               max="100"
               value={blueFilterIntensity}
-              onChange={(e) => setBlueFilterIntensity(parseInt(e.target.value))}
+              onChange={(e) => {
+                setBlueFilterIntensity(parseInt(e.target.value));
+              }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
           
           {/* Contrast */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Contrast: {contrast}%
             </label>
             <input
@@ -624,14 +658,16 @@ export default function FullScreenNoteViewer({ note, onClose }) {
               min="50"
               max="150"
               value={contrast}
-              onChange={(e) => setContrast(parseInt(e.target.value))}
+              onChange={(e) => {
+                setContrast(parseInt(e.target.value));
+              }}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
           
           {/* Background Color */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Background color
             </label>
             <div className="flex items-center gap-2">
@@ -639,20 +675,20 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 type="color"
                 value={backgroundColor}
                 onChange={(e) => setBackgroundColor(e.target.value)}
-                className="w-12 h-12 rounded cursor-pointer"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded cursor-pointer flex-shrink-0"
               />
               <input
                 type="text"
                 value={backgroundColor}
                 onChange={(e) => setBackgroundColor(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
           
           {/* Text Color */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Text color
             </label>
             <div className="flex items-center gap-2">
@@ -660,26 +696,26 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 type="color"
                 value={textColor}
                 onChange={(e) => setTextColor(e.target.value)}
-                className="w-12 h-12 rounded cursor-pointer"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded cursor-pointer flex-shrink-0"
               />
               <input
                 type="text"
                 value={textColor}
                 onChange={(e) => setTextColor(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
           
           {/* Font Family */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Font family
             </label>
             <select
               value={fontFamily}
               onChange={(e) => setFontFamily(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {FONT_FAMILY_OPTIONS.map(font => (
                 <option key={font} value={font}>{font}</option>
@@ -688,14 +724,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Font Size Dropdown */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Font size
             </label>
             <select
               value={fontSizeDropdown}
               onChange={(e) => setFontSizeDropdown(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {FONT_SIZE_OPTIONS.map(size => (
                 <option key={size} value={size}>{size}</option>
@@ -704,14 +740,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Line Spacing */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Line spacing
             </label>
             <select
               value={lineSpacing}
               onChange={(e) => setLineSpacing(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {['1.0', '1.2', '1.4', '1.6', '1.8', '2.0'].map(spacing => (
                 <option key={spacing} value={spacing}>{spacing}</option>
@@ -720,14 +756,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Letter Spacing */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Letter spacing
             </label>
             <select
               value={letterSpacing}
               onChange={(e) => setLetterSpacing(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {SPACING_OPTIONS.map(spacing => (
                 <option key={spacing} value={spacing}>{spacing}</option>
@@ -736,14 +772,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Word Spacing */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Word spacing
             </label>
             <select
               value={wordSpacing}
               onChange={(e) => setWordSpacing(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {SPACING_OPTIONS.map(spacing => (
                 <option key={spacing} value={spacing}>{spacing}</option>
@@ -752,14 +788,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Max Column Width */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Max column width
             </label>
             <select
               value={maxColumnWidth}
               onChange={(e) => setMaxColumnWidth(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {WIDTH_OPTIONS.map(width => (
                 <option key={width} value={width}>{width}</option>
@@ -768,14 +804,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Margins (Padding) */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div className="mb-4 sm:mb-6">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Margins (padding)
             </label>
             <select
               value={margins}
               onChange={(e) => setMargins(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-xs sm:text-sm dark:bg-gray-700 dark:text-white"
             >
               {MARGIN_OPTIONS.map(margin => (
                 <option key={margin} value={margin}>{margin}</option>
@@ -784,7 +820,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           </div>
           
           {/* Feature Toggles */}
-          <div className="mb-6 space-y-3">
+          <div className="mb-4 sm:mb-6 space-y-3">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -792,7 +828,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 onChange={(e) => setReadingRuler(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Reading ruler</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Reading ruler</span>
             </label>
             
             <label className="flex items-center gap-3 cursor-pointer">
@@ -802,7 +838,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 onChange={(e) => setFocusMode(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Focus mode</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Focus mode</span>
             </label>
             
             <label className="flex items-center gap-3 cursor-pointer">
@@ -812,7 +848,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 onChange={(e) => setAutoHideControls(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Auto-hide controls (full screen)</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Auto-hide controls (full screen)</span>
             </label>
             
             <label className="flex items-center gap-3 cursor-pointer">
@@ -822,7 +858,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 onChange={(e) => setInvertColors(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Invert colors</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Invert colors</span>
             </label>
             
             <label className="flex items-center gap-3 cursor-pointer">
@@ -832,7 +868,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                 onChange={(e) => setGrayscale(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Grayscale</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Grayscale</span>
             </label>
           </div>
           
@@ -860,6 +896,40 @@ export default function FullScreenNoteViewer({ note, onClose }) {
               Restore
             </button>
           </div>
+
+          {/* Reset Settings Button */}
+          <button
+            onClick={() => {
+              if (confirm('Are you sure you want to reset all settings to default?')) {
+                setBrightness(100);
+                setBlueFilterIntensity(0);
+                setContrast(100);
+                setBackgroundColor('#ffffff');
+                setTextColor('#000000');
+                setFontFamily('Sans-serif');
+                setFontSizeDropdown('Medium');
+                setLineSpacing('1.6');
+                setLetterSpacing('Normal');
+                setWordSpacing('Normal');
+                setMaxColumnWidth('Medium');
+                setMargins('Medium');
+                setReadingRuler(false);
+                setFocusMode(false);
+                setAutoHideControls(false);
+                setInvertColors(false);
+                setGrayscale(false);
+                setTextStyle('classic');
+                setEyeProtectionMode('normal');
+                setFontSize(100);
+                setLineHeight(1.6);
+                alert('Settings reset to default!');
+              }
+            }}
+            className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset All Settings
+          </button>
         </div>
       )}
 
@@ -869,14 +939,6 @@ export default function FullScreenNoteViewer({ note, onClose }) {
         className="h-full overflow-y-auto pt-20 pb-8 px-4 sm:px-8 lg:px-16"
         onClick={() => setShowControls(!showControls)}
         style={{
-          filter: `
-            brightness(${brightness}%) 
-            contrast(${contrast}%) 
-            sepia(${blueFilterIntensity / 100}) 
-            ${invertColors ? 'invert(1)' : ''} 
-            ${grayscale ? 'grayscale(1)' : ''}
-          `.trim(),
-          backgroundColor,
           transition: 'all 0.3s ease'
         }}
       >
@@ -903,7 +965,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
         )}
         
         <div 
-          className="max-w-4xl mx-auto"
+          className="max-w-4xl mx-auto transition-all duration-300"
           style={{
             maxWidth: maxColumnWidth === 'Small' ? '600px' : 
                       maxColumnWidth === 'Medium' ? '800px' : 
@@ -937,10 +999,14 @@ export default function FullScreenNoteViewer({ note, onClose }) {
           <div className="prose prose-lg max-w-none">
             {note.content ? (
               <div
+                className="transition-all duration-300"
                 style={{
                   fontFamily: fontFamily === 'Sans-serif' ? 'system-ui, sans-serif' :
                              fontFamily === 'Serif' ? 'Georgia, serif' :
                              fontFamily === 'Monospace' ? 'SF Mono, Monaco, monospace' :
+                             fontFamily === 'Georgia' ? 'Georgia, serif' :
+                             fontFamily === 'Arial' ? 'Arial, sans-serif' :
+                             fontFamily === 'Times New Roman' ? 'Times New Roman, serif' :
                              fontFamily,
                   fontSize: fontSizeDropdown === 'Small' ? '14px' :
                            fontSizeDropdown === 'Medium' ? '16px' :
@@ -954,6 +1020,7 @@ export default function FullScreenNoteViewer({ note, onClose }) {
                               wordSpacing === 'Normal' ? '0px' :
                               wordSpacing === 'Relaxed' ? '2px' : '4px',
                   color: textColor,
+                  backgroundColor: 'transparent',
                   whiteSpace: 'pre-wrap',
                   wordWrap: 'break-word',
                   textAlign: 'justify'
